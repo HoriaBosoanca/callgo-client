@@ -23,7 +23,7 @@ export class CameraComponent implements OnInit {
 	canvas!: HTMLCanvasElement;
 	displayImage!: HTMLImageElement;
 
-	delay: number = 20
+	delay: number = 50
 
   	// Toggle camera on/off
 	async camera(videoElement: HTMLVideoElement): Promise<void> {
