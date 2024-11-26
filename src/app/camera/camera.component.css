@@ -1,0 +1,52 @@
+video{
+    height: 80%;
+    margin-top: 5vh;
+}
+
+#videos{
+    background-color: rgb(65, 65, 65);
+
+    width: 100%;
+    height: 70vh;
+
+    border-radius: 1vh;
+
+    display: flex;
+    justify-content: center;
+}
+
+#controls{
+    background-color: rgb(49, 49, 49);
+    border-radius: 1vh;
+
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.562);
+    
+    width: 100%;
+    height: 26vh;
+
+    box-shadow: 1vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: last baseline;
+}
+
+.iobutton{
+    margin: auto;
+    height: 12vh;
+    width: 12vh;
+    margin-bottom: 1.5vh;
+    
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
+
+    border-width: 0vh;
+    border-radius: 1vh;
+    background-color: rgb(85, 156, 38);
+    color: red;
+
+    transition: 0.3s;
+}
+
+.iobutton:hover{
+    background-color: rgb(60, 255, 0);
+}
