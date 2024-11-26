@@ -15,7 +15,7 @@ export class ApiService {
     });
   }
 
-  private apiUrl = 'http://localhost:1234'
+  private apiUrl = 'https://callgo-server-386137910114.europe-west3.run.app'
 
   postVideo(endpoint: string, videoData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/${endpoint}`, videoData, { headers: this.getHeaders() });
