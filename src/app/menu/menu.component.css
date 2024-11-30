@@ -1,0 +1,66 @@
+.menu-button{
+    height: 10vh;
+    width: 20%;
+    color: white;
+    font-size: 3vh;
+
+    background-color: rgb(85, 156, 38);
+    border-radius: 1vh;
+    margin: auto;
+
+    border-width: 0vh;
+    border-radius: 1vh;
+
+    transition: 0.3s;
+}
+
+.menu-button:hover{
+    background-color: rgb(60, 255, 0);
+}
+
+.menu-item{
+    height: 15vh;
+    width: 100%;
+
+    display: flex;
+    align-items: last baseline;
+}
+
+#name-box{
+    width: 100%;
+    text-align: center;
+    margin: auto;
+}
+
+#name-p{
+    font-size: 3vh;
+    color: white;
+}
+
+#name-textarea{
+    font-size: 3vh;
+    height: 5vh;
+    width: 20%;
+    border-radius: 1vh;
+}
+
+img{
+    width: 10%;
+    margin: auto;
+}
+
+
+#title-box{
+    width: 100%;
+    text-align: center;
+}
+
+h1{
+    font-size: 5vh;
+    color: white;
+}
+
+/* FOR EXTRA MARGIN-BOTTOM */
+.mb{
+    margin-bottom: 5vh;
+}

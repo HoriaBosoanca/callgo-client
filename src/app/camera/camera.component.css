@@ -42,7 +42,6 @@ video{
     border-width: 0vh;
     border-radius: 1vh;
     background-color: rgb(85, 156, 38);
-    color: red;
 
     transition: 0.3s;
 }
