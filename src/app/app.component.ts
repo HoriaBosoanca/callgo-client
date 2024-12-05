@@ -1,12 +1,12 @@
-import { Component, OnChanges, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { RouterModule, RouterOutlet } from '@angular/router';
 import { CameraComponent } from "./camera/camera.component";
 import { MenuComponent } from './menu/menu.component';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [Router, CameraComponent, MenuComponent],
+  imports: [RouterOutlet, RouterModule, CameraComponent, MenuComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

@@ -68,7 +68,7 @@ export class CameraComponent implements OnInit {
 		const frame = this.canvas.toDataURL('image/jpeg'); // Capture frame as Base64
 
 		try {
-			console.log(this.sessionService.hostID, this.sessionService.myID)
+			// console.log(this.sessionService.hostID, this.sessionService.myID)
 			await this.apiService.postVideo(frame, this.sessionService.hostID, this.sessionService.myID).toPromise();
 		} catch (error) {
 			console.error('Error uploading video chunk:', error);
@@ -77,9 +77,9 @@ export class CameraComponent implements OnInit {
 
 	async receive(): Promise<void> {
 		try {
-			console.log(this.sessionService.hostID, this.sessionService.myID)
-			const frame: string = await this.apiService.getVideo(this.sessionService.hostID, this.sessionService.myID).toPromise();
-			this.displayImage.src = frame
+			// console.log(this.sessionService.hostID, this.sessionService.myID)
+			const frameObj = await this.apiService.getVideo(this.sessionService.hostID, this.sessionService.myID).toPromise();
+			this.displayImage.src = frameObj.video
 		} catch (error) {
 			console.error('Error during video reception:', error);
 		}

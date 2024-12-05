@@ -19,7 +19,7 @@ export class ApiService {
 
   // VIDEO
   postVideo(videoData: string, sessionID: number, memberID: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/video/${sessionID}/${memberID}`, videoData, { headers: this.getHeaders() });
+    return this.http.post(`${this.apiUrl}/video/${sessionID}/${memberID}`, { video: videoData }, { headers: this.getHeaders() });
   }
 
   getVideo(sessionID: number, memberID: number): Observable<any> {
