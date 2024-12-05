@@ -18,12 +18,12 @@ export class ApiService {
   private apiUrl = 'https://callgo-server-386137910114.europe-west3.run.app'
 
   // VIDEO
-  postVideo(videoData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/video`, videoData, { headers: this.getHeaders() });
+  postVideo(videoData: string, sessionID: number, memberID: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/video/${sessionID}/${memberID}`, videoData, { headers: this.getHeaders() });
   }
 
-  getVideo(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/video`, { headers: this.getHeaders() });
+  getVideo(sessionID: number, memberID: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/video/${sessionID}/${memberID}`, { headers: this.getHeaders() });
   }
 
   // SESSION

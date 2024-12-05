@@ -68,8 +68,8 @@ export class CameraComponent implements OnInit {
 		const frame = this.canvas.toDataURL('image/jpeg'); // Capture frame as Base64
 
 		try {
-			let id = this.generateID()
-			await this.apiService.postVideo({ ID: id, video: frame }).toPromise();
+			console.log(this.sessionService.hostID, this.sessionService.myID)
+			await this.apiService.postVideo(frame, this.sessionService.hostID, this.sessionService.myID).toPromise();
 		} catch (error) {
 			console.error('Error uploading video chunk:', error);
 		}
@@ -77,8 +77,9 @@ export class CameraComponent implements OnInit {
 
 	async receive(): Promise<void> {
 		try {
-			const frameAndID: any = await this.apiService.getVideo().toPromise();
-			this.displayImage.src = frameAndID.video;
+			console.log(this.sessionService.hostID, this.sessionService.myID)
+			const frame: string = await this.apiService.getVideo(this.sessionService.hostID, this.sessionService.myID).toPromise();
+			this.displayImage.src = frame
 		} catch (error) {
 			console.error('Error during video reception:', error);
 		}
@@ -86,15 +87,6 @@ export class CameraComponent implements OnInit {
 
 	sleep(ms: number): Promise<void> {
 		return new Promise(resolve => setTimeout(resolve, ms));
-	}
-
-	existingIDs: number[] = [];
-	nextId = 1;
-	generateID() {
-		this.existingIDs.push(this.nextId);
-		let id = this.nextId;
-		this.nextId++;
-		return id;
 	}
 }
 
