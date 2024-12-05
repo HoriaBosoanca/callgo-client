@@ -19,7 +19,7 @@
 }
 
 .menu-item{
-    height: 15vh;
+    height: 12vh;
     width: 100%;
 
     display: flex;
@@ -37,11 +37,13 @@
     color: white;
 }
 
-#name-textarea{
+.my-textarea{
     font-size: 3vh;
     height: 5vh;
     width: 20%;
     border-radius: 1vh;
+    border-width: 0.5vh;
+    border-color: yellowgreen;
 }
 
 img{

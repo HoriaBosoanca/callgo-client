@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../api.service';
+import { SessionService } from '../session.service';
 
 @Component({
   selector: 'app-camera',
@@ -11,9 +12,11 @@ import { ApiService } from '../api.service';
   styleUrls: ['./camera.component.css']
 })
 export class CameraComponent implements OnInit {
-	constructor(private apiService: ApiService) {}
+	constructor(private apiService: ApiService, private sessionService: SessionService) {}
 
-	ngOnInit() {
+	async ngOnInit() {
+		console.log(await this.apiService.getSession(this.sessionService.hostID).toPromise())
+
 		this.canvas = document.createElement('canvas'); // Hidden canvas for capturing video frames
 		this.displayImage = document.getElementById('reconstructedFrame') as HTMLImageElement;
 	}
@@ -66,7 +69,7 @@ export class CameraComponent implements OnInit {
 
 		try {
 			let id = this.generateID()
-			await this.apiService.postVideo('video', { ID: id, video: frame }).toPromise();
+			await this.apiService.postVideo({ ID: id, video: frame }).toPromise();
 		} catch (error) {
 			console.error('Error uploading video chunk:', error);
 		}
@@ -74,7 +77,7 @@ export class CameraComponent implements OnInit {
 
 	async receive(): Promise<void> {
 		try {
-			const frameAndID: any = await this.apiService.getVideo('video').toPromise();
+			const frameAndID: any = await this.apiService.getVideo().toPromise();
 			this.displayImage.src = frameAndID.video;
 		} catch (error) {
 			console.error('Error during video reception:', error);

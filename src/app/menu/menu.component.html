@@ -3,26 +3,32 @@
         <h1>CALLGO</h1>
     </div>
 </div>
-
 <div class="menu-item mb">
     <img src="../../assets/images/Callgo-logo.png">
 </div>
 
+
 <div class="menu-item mb">
     <div id="name-box">
         <p id="name-p">Name</p>
-        <textarea name="name" id="name-textarea"></textarea>
+        <textarea [(ngModel)]="displayName" class="my-textarea" #nameInput></textarea>
     </div>
 </div>
-
 <div class="menu-item">
-    <button class="menu-button">
+    <button (click)="startMeeting()" class="menu-button">
         Create meeting
     </button>
 </div>
 
+
+<div class="menu-item mb">
+    <div id="name-box">
+        <p id="name-p">Meeting id</p>
+        <textarea [(ngModel)]="meetingID" class="my-textarea" #joinInput></textarea>
+    </div>
+</div>
 <div class="menu-item">
-    <button class="menu-button">
+    <button (click)="joinMeeting()" class="menu-button">
         Join meeting
     </button>
 </div>
