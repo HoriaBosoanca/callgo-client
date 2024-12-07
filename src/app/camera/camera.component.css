@@ -1,30 +1,15 @@
-video{
-    height: 80%;
-    margin-top: 5vh;
-}
-
-#videos{
-    background-color: rgb(65, 65, 65);
-
-    width: 100%;
-    height: 70vh;
-
-    border-radius: 1vh;
-
-    display: flex;
-    justify-content: center;
-}
-
 #controls{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+
     background-color: rgb(49, 49, 49);
     border-radius: 1vh;
 
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.562);
     
     width: 100%;
-    height: 26vh;
-
-    box-shadow: 1vh;
+    height: 30vh;
 
     display: flex;
     justify-content: center;

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ApiService } from '../api.service';
 import { SessionService } from '../session.service';
 import { DisplayComponent } from '../display/display.component';
+import { delay } from 'rxjs';
 
 @Component({
   selector: 'app-camera',
@@ -17,7 +18,6 @@ export class CameraComponent implements OnInit {
 
 	async ngOnInit() {
 		this.canvas = document.createElement('canvas'); // Hidden canvas for capturing video frames
-		this.displayImage = document.getElementById('reconstructedFrame') as HTMLImageElement;
 	}
 
   	camIsOn = false;
@@ -27,33 +27,23 @@ export class CameraComponent implements OnInit {
 
   	// Toggle camera on/off
 	async camera(): Promise<void> {
-    	try {
 			// toggle
 			if (this.camIsOn) {
 				this.turnOffCamera()
 			} else {
 				await this.turnOnCamera()
-				while(this.camIsOn) {
+				const timer = setInterval(async () => {
 					await this.send();
-					await this.receive();
-				}
+				}, this.sessionService.delay)
 			}
-		} catch (err) {
-			console.error('Error accessing the camera', err);
-		}
   	}
 
 	turnOffCamera() {
-		this.sessionService.camIsOn = false
-
 		this.camIsOn = false;
 		this.videoElement.nativeElement.srcObject = null;
-		this.displayImage.style.display = "none";
 	}
 
 	async turnOnCamera() {
-		this.sessionService.camIsOn = true
-
 		this.camIsOn = true;
 		this.videoElement.nativeElement.style.display = "none"; // don't display the input version of yourself
 		const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
@@ -70,21 +60,7 @@ export class CameraComponent implements OnInit {
 			console.error('Error uploading video chunk:', error);
 		}
 	}
-	
-	async receive(): Promise<void> {
-		try {
-			// console.log(this.sessionService.hostID, this.sessionService.myID)
-			const frameObj = await this.apiService.getVideo(this.sessionService.hostID, this.sessionService.myID).toPromise();
-			this.displayImage.src = frameObj.video
-		} catch (error) {
-			console.error('Error during video reception:', error);
-		}
-	}
-	
-	// sleep(ms: number): Promise<void> {
-	// 	return new Promise(resolve => setTimeout(resolve, ms));
-	// }
-	
+
 	// Capture frame as Base64
 	createVideoFrame(): string {
 		this.canvas.width = this.videoElement.nativeElement.videoWidth;

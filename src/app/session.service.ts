@@ -5,16 +5,10 @@ import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root'
 })
-export class SessionService implements OnInit {
+export class SessionService {
 	constructor(private apiService: ApiService, private router: Router) { }
 
-	ngOnInit(): void {
-		if(this.hostID == -1){
-			this.router.navigate(['/menu'])
-		}
-	}
-
-	public camIsOn = false
+	public delay: number = 100 
 
 	public hostID: number = -1
 	
@@ -33,8 +27,8 @@ export class SessionService implements OnInit {
 
 		let frames: string[] = []
 		for(let id of members) {
-			let videoFrame: string = await this.apiService.getVideo(this.hostID, id).toPromise()
-			frames.push(videoFrame)
+			let videoFrame = await this.apiService.getVideo(this.hostID, id).toPromise()
+			frames.push(videoFrame.video)
 		}
 		return frames
 	}
