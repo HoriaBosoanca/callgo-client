@@ -44,12 +44,16 @@ export class CameraComponent implements OnInit {
   	}
 
 	turnOffCamera() {
+		this.sessionService.camIsOn = false
+
 		this.camIsOn = false;
 		this.videoElement.nativeElement.srcObject = null;
 		this.displayImage.style.display = "none";
 	}
 
 	async turnOnCamera() {
+		this.sessionService.camIsOn = true
+
 		this.camIsOn = true;
 		this.videoElement.nativeElement.style.display = "none"; // don't display the input version of yourself
 		const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });

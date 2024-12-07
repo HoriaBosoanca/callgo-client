@@ -14,6 +14,8 @@ export class SessionService implements OnInit {
 		}
 	}
 
+	public camIsOn = false
+
 	public hostID: number = -1
 	
 	public myID: number = -1
@@ -21,15 +23,18 @@ export class SessionService implements OnInit {
 
 	public videoFrames: string[] = []
 
-	async requestFrames() {
-		console.log('Meeting id: ', this.hostID)
-		let members: number[] = await this.getAllIDs(this.hostID) 
-		console.log('Members', members)
+	async requestFrames(): Promise<string[]> {
+		let members: number[] = await this.getAllIDs(this.hostID)
+		if(members == null) {
+			members = [this.hostID]
+		} else {
+			members.push(this.hostID)
+		}
 
-		let frames: number[] = []
+		let frames: string[] = []
 		for(let id of members) {
-			let videoFrame = await this.apiService.getVideo(this.hostID, id).toPromise()
-			frames.push(videoFrame);
+			let videoFrame: string = await this.apiService.getVideo(this.hostID, id).toPromise()
+			frames.push(videoFrame)
 		}
 		return frames
 	}

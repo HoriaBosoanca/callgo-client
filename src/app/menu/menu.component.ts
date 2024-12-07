@@ -27,6 +27,7 @@ export class MenuComponent implements OnInit {
 	async startMeeting() {
 		if(this.displayName != "") {
 			this.sessionService.myID = await this.apiService.createSession().toPromise()
+			await this.apiService.joinSession(this.sessionService.myID).toPromise()
 			this.sessionService.hostID = this.sessionService.myID
 	
 			this.sessionService.displayName = this.displayName

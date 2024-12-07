@@ -12,6 +12,9 @@ export class DisplayComponent implements OnInit {
 	constructor(private sessionService: SessionService) {}
 
 	async ngOnInit(): Promise<void> {
-		console.log('Frames', this.sessionService.requestFrames())
+		console.log('Frames', await this.sessionService.requestFrames())
+		while(true) {
+			let frames: string[] = await this.sessionService.requestFrames()
+		}
 	}
 }
