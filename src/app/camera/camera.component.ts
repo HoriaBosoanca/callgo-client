@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../api.service';
 import { SessionService } from '../session.service';
+import { DisplayComponent } from '../display/display.component';
 
 @Component({
   selector: 'app-camera',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, DisplayComponent],
   templateUrl: './camera.component.html',
   styleUrls: ['./camera.component.css']
 })
@@ -24,8 +25,6 @@ export class CameraComponent implements OnInit {
 	canvas!: HTMLCanvasElement;
 	displayImage!: HTMLImageElement;
 
-	delay: number = 20
-
   	// Toggle camera on/off
 	async camera(): Promise<void> {
     	try {
@@ -37,7 +36,6 @@ export class CameraComponent implements OnInit {
 				while(this.camIsOn) {
 					await this.send();
 					await this.receive();
-					await this.sleep(this.delay);
 				}
 			}
 		} catch (err) {
@@ -79,9 +77,9 @@ export class CameraComponent implements OnInit {
 		}
 	}
 	
-	sleep(ms: number): Promise<void> {
-		return new Promise(resolve => setTimeout(resolve, ms));
-	}
+	// sleep(ms: number): Promise<void> {
+	// 	return new Promise(resolve => setTimeout(resolve, ms));
+	// }
 	
 	// Capture frame as Base64
 	createVideoFrame(): string {
