@@ -64,4 +64,9 @@ export class CameraComponent implements OnInit {
 		context?.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height);
 		return this.canvas.toDataURL('image/jpeg');
 	}
+
+	listIsDisplayed = false
+	toggleList() {
+		this.listIsDisplayed = !this.listIsDisplayed
+	}
 }

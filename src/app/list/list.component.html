@@ -1,3 +1,6 @@
-<div *ngFor="let item of stableIDs">
-    <p>{{ item }}</p>
+<div class="list-item">
+    <p class="text"> • Meeting code: {{ sessionService.hostID }} • Meeting host: hostName</p>
+</div>
+<div class="list-item" *ngFor="let ID of sessionService.stableIDs">
+    <p class="text"> • Name: name • Id: {{ ID }} </p>
 </div>

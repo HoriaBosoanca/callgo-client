@@ -1,6 +1,6 @@
-<app-display></app-display>
+<app-list *ngIf="listIsDisplayed"></app-list>
 
-<app-list></app-list>
+<app-display></app-display>
 
 <div id="controls">
     <button class="iobutton" (click)="camera()">
@@ -13,7 +13,7 @@
     </button>
 
     <!-- TODO: members list -->
-    <button class="iobutton">
+    <button class="iobutton" (click)="toggleList()">
         <img style="width: 70%;" src="assets/images/list-icon.png">
     </button>
 </div>
