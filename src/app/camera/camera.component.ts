@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { ApiService } from '../api.service';
 import { SessionService } from '../session.service';
 import { DisplayComponent } from '../display/display.component';
+import { ListComponent } from '../list/list.component';
 
 @Component({
   selector: 'app-camera',
   standalone: true,
-  imports: [FormsModule, CommonModule, DisplayComponent],
+  imports: [FormsModule, CommonModule, DisplayComponent, ListComponent],
   templateUrl: './camera.component.html',
   styleUrls: ['./camera.component.css']
 })

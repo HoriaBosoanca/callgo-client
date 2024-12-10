@@ -16,6 +16,8 @@ export class SessionService {
 	public myID: number = -1
 	public displayName: string = "null"
 
+	public stableIDs: number[] = []
+
 	async getAllIDs(hostID: number): Promise<number[]> {
 		let sessionObj = await this.apiService.getSession(hostID).toPromise();
 		let members: number[] = sessionObj.members
@@ -24,12 +26,15 @@ export class SessionService {
 		} else {
 			members.push(this.hostID)
 		}
+
+		if(members != this.stableIDs) {
+			this.stableIDs = members
+		}
+
 		return members;
 	}
 
 	// video frame mangement 
-	public videoFrames: string[] = []
-	
 	async requestFrames(): Promise<string[]> {
 		let members: number[] = await this.getAllIDs(this.hostID)
 		let frames: string[] = []

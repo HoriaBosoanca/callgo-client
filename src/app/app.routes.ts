@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { MenuComponent } from './menu/menu.component';
 import { CameraComponent } from './camera/camera.component';
-import { DisplayComponent } from './display/display.component';
 
 export const routes: Routes = [
     { path: 'menu', component: MenuComponent }, 
