@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, Renderer2 } from '@angular/core';
 import { SessionService } from '../session.service';
 import { CommonModule } from '@angular/common';
 
@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './display.component.css'
 })
 export class DisplayComponent implements OnInit {
-	constructor(private sessionService: SessionService) {}
+	constructor(private sessionService: SessionService, private renderer: Renderer2) {}
 
 	@ViewChild('videoBox') videoBox!: ElementRef
 
@@ -38,10 +38,20 @@ export class DisplayComponent implements OnInit {
 	correctImagesGenerated: boolean = false
 	images: HTMLImageElement[] = []
 	resetImages(amountOfMembers: number) {
+		for(let image of this.images){
+			image.remove()
+		}
+		this.images = []
 		for(let i = 0; i < amountOfMembers; ++i) {
 			let img = document.createElement('img')
+
+			// Styles
 			img.style.margin = 'auto'
 			img.alt = ''
+			img.style.borderRadius = '1vh'
+			img.style.borderWidth = '1rem'
+			img.style.width = `${100 / this.frames.length}%`
+			
 			this.videoBox.nativeElement.appendChild(img)
 			this.images.push(img)
 			// this.videoBox.nativeElement.innerHTML = ''
