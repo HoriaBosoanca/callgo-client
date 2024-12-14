@@ -15,7 +15,6 @@ export class DisplayComponent implements OnInit {
 	@ViewChild('videoBox') videoBox!: ElementRef
 
 	async ngOnInit(): Promise<void> {
-		console.log(this.sessionService.hostID)
 		const timer = setInterval(async () => {
 			let oldAmountOfMembers = this.frames.length
 			this.frames = await this.sessionService.requestFrames()

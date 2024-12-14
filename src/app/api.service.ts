@@ -18,24 +18,24 @@ export class ApiService {
   private apiUrl = 'https://callgo-server-386137910114.europe-west3.run.app'
 
   // VIDEO
-  postVideo(videoData: string, sessionID: number, memberID: number): Observable<any> {
+  postVideo(videoData: string, sessionID: string, memberID: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/video/${sessionID}/${memberID}`, { video: videoData }, { headers: this.getHeaders() });
   }
 
-  getVideo(sessionID: number, memberID: number): Observable<any> {
+  getVideo(sessionID: string, memberID: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/video/${sessionID}/${memberID}`, { headers: this.getHeaders() });
   }
 
   // SESSION
-  createSession(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/session`, { headers: this.getHeaders() });
+  createSession(displayName: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/session`, {"name":displayName}, { headers: this.getHeaders() });
   }
 
-  joinSession(hostID: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/session/${hostID}`, { headers: this.getHeaders() });
+  joinSession(hostID: string, displayName: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/session/${hostID}`, {"name":displayName}, { headers: this.getHeaders() });
   }
 
-  getSession(hostID: number): Observable<any> {
+  getSession(hostID: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/session/${hostID}`, { headers: this.getHeaders() });
   }
 }

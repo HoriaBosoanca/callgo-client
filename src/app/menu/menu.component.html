@@ -1,34 +1,51 @@
 <div class="menu-item">
     <div id="title-box">
-        <h1>CALLGO</h1>
+        <h1 style="color: yellowgreen;">CALLGO</h1>
     </div>
 </div>
-<div class="menu-item mb">
-    <img src="../../assets/images/Callgo-logo.png">
+<div>
+    <img src="../../assets/images/Callgo-logo2v2.png">
 </div>
 
-
-<div class="menu-item mb">
-    <div id="name-box">
-        <p id="name-p">Name</p>
-        <textarea [(ngModel)]="displayName" class="my-textarea" #nameInput></textarea>
+<!-- MENU -->
+<div style="display: flex;">
+    <!-- Create UI -->
+    <div style="background-color: rgb(46, 46, 46); width: 45%; height: 50vh; border-radius: 1vh; margin-left: 2.5%;">
+        <!-- Name input -->
+        <div class="menu-item mb">
+            <div id="name-box">
+                <p id="name-p">Name</p>
+                <textarea [(ngModel)]="displayNameCreate" class="my-textarea" #nameInputCreate></textarea>
+            </div>
+        </div>
+        <!-- Join button -->
+        <div class="menu-item">
+            <button (click)="startMeeting()" class="menu-button">
+                Create meeting
+            </button>
+        </div>
     </div>
-</div>
-<div class="menu-item">
-    <button (click)="startMeeting()" class="menu-button">
-        Create meeting
-    </button>
-</div>
-
-
-<div class="menu-item mb">
-    <div id="name-box">
-        <p id="name-p">Meeting id</p>
-        <textarea [(ngModel)]="meetingID" class="my-textarea" #joinInput></textarea>
+    <!-- Join UI -->
+    <div style="background-color: rgb(101, 101, 101); width: 45%; height: 50vh; border-radius: 1vh; margin-left: 5%;">
+        <!-- Name input -->
+        <div class="menu-item mb">
+            <div id="name-box">
+                <p id="name-p">Name</p>
+                <textarea [(ngModel)]="displayNameJoin" class="my-textarea" #nameInputJoin></textarea>
+            </div>
+        </div>
+        <!-- Meeting ID input -->
+        <div class="menu-item mb">
+            <div id="name-box">
+                <p id="name-p">Meeting id</p>
+                <textarea [(ngModel)]="meetingID" class="my-textarea" #joinInput></textarea>
+            </div>
+        </div>
+        <!-- Join button -->
+        <div class="menu-item">
+            <button (click)="joinMeeting()" class="menu-button">
+                Join meeting
+            </button>
+        </div>
     </div>
-</div>
-<div class="menu-item">
-    <button (click)="joinMeeting()" class="menu-button">
-        Join meeting
-    </button>
 </div>

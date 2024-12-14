@@ -12,23 +12,25 @@ export class SessionService {
 	public delay: number = 100 
 
 	// session management
-	public hostID: number = -1
-	public myID: number = -1
+	public hostID: string = "null"
+	public hostDisplayName: string = "null"
+	public myID: string = "null"
 	public displayName: string = "null"
 
-	public stableIDs: number[] = []
+	public stableMembers: any[] = []
 
-	async getAllIDs(hostID: number): Promise<number[]> {
+	async getAllIDs(hostID: string): Promise<number[]> {
 		let sessionObj = await this.apiService.getSession(hostID).toPromise();
-		let members: number[] = sessionObj.members
+		this.hostDisplayName = sessionObj.host.name
+		let members: any[] = sessionObj.members
 		if(members == null) {
-			members = [this.hostID]
+			members = [{"name":this.hostDisplayName, "ID":this.hostID}]
 		} else {
-			members.push(this.hostID)
+			members.push({"name":this.hostDisplayName, "ID":this.hostID})
 		}
 
-		if(members != this.stableIDs) {
-			this.stableIDs = members
+		if(members != this.stableMembers) {
+			this.stableMembers = members
 		}
 
 		return members;
@@ -36,10 +38,10 @@ export class SessionService {
 
 	// video frame mangement 
 	async requestFrames(): Promise<string[]> {
-		let members: number[] = await this.getAllIDs(this.hostID)
+		let members: any[] = await this.getAllIDs(this.hostID)
 		let frames: string[] = []
-		for(let id of members) {
-			let videoFrame = await this.apiService.getVideo(this.hostID, id).toPromise()
+		for(let member of members) {
+			let videoFrame = await this.apiService.getVideo(this.hostID, member.ID).toPromise()
 			frames.push(videoFrame.video)
 		}
 		return frames

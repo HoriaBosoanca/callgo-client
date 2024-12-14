@@ -17,43 +17,39 @@ export class MenuComponent implements OnInit {
 	ngOnInit(): void {}
 	
 	// input
-	displayName: string = ""
-	meetingID: number = -1
+	displayNameCreate: string = ""
+	displayNameJoin: string = ""
+	meetingID: string = ""
 	
 	// HTML refs
-	@ViewChild('nameInput') nameInput!: ElementRef;
+	@ViewChild('nameInputCreate') nameInputCreate!: ElementRef;
+	@ViewChild('nameInputJoin') nameInputJoin!: ElementRef;
 	@ViewChild('joinInput') joinInput!: ElementRef;
 
 	async startMeeting() {
-		if(this.displayName != "") {
-			this.sessionService.myID = await this.apiService.createSession().toPromise()
-			await this.apiService.joinSession(this.sessionService.myID).toPromise()
+		if(this.displayNameCreate != "") {
+			this.sessionService.myID = await this.apiService.createSession(this.displayNameCreate).toPromise()
 			this.sessionService.hostID = this.sessionService.myID
 	
-			this.sessionService.displayName = this.displayName
+			this.sessionService.displayName = this.displayNameCreate
 			this.router.navigate(['/video'])
 		} else {
-			this.nameInput.nativeElement.style.borderColor = 'red'
+			this.nameInputCreate.nativeElement.style.borderColor = 'red'
 			console.log("Empty name")
 		}
 	}
 
 	
 	async joinMeeting() {
-		try {
-			if(this.displayName != "") {
-				this.sessionService.myID = await this.apiService.joinSession(this.meetingID).toPromise()
-				this.sessionService.hostID = this.meetingID
-			} else {
-				this.nameInput.nativeElement.style.borderColor = 'red'
-				console.log("Empty name")
-			}
-		} catch(err) {
+		if(this.displayNameJoin != "" && this.meetingID != "") {
+			this.sessionService.myID = await this.apiService.joinSession(this.meetingID, this.displayNameJoin).toPromise()
+			this.sessionService.hostID = this.meetingID
+		} else {
+			this.nameInputJoin.nativeElement.style.borderColor = 'red'
 			this.joinInput.nativeElement.style.borderColor = 'red'
-			throw err
+			throw new Error("Empty name or ID")
 		}
-
-		this.sessionService.displayName = this.displayName
+		this.sessionService.displayName = this.displayNameJoin
 		this.router.navigate(['/video'])
 	}
 }
