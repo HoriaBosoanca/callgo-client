@@ -14,20 +14,22 @@ export class DisplayComponent implements OnInit {
 
 	@ViewChild('videoBox') videoBox!: ElementRef
 
+	framesAndNames: any[] = []
 	async ngOnInit(): Promise<void> {
 		const timer = setInterval(async () => {
-			let oldAmountOfMembers = this.frames.length
-			this.frames = await this.sessionService.requestFrames()
-			if(oldAmountOfMembers != this.frames.length) {
-				this.resetImages(this.frames.length)
+			let oldAmountOfMembers = this.framesAndNames.length
+			this.framesAndNames = await this.sessionService.requestFramesAndNames()
+			if(oldAmountOfMembers != this.framesAndNames.length) {
+				this.resetImages(this.framesAndNames.length)
 			}
 
 			if(!this.correctImagesGenerated) {
-				this.resetImages(this.frames.length)
+				this.resetImages(this.framesAndNames.length)
 			}
 
 			for(let i = 0; i < this.images.length; ++i) {
-				this.images[i].src = this.frames[i]
+				this.images[i].src = this.framesAndNames[i].video
+				console.log(this.framesAndNames[i].name)
 				if(this.images[i].src == 'data:,') {
 					this.images[i].src = '../../assets/images/black.png'
 				}
@@ -36,10 +38,9 @@ export class DisplayComponent implements OnInit {
 		}, this.sessionService.delay)
 	}
 	
-	frames: string[] = []
-	
 	correctImagesGenerated: boolean = false
 	images: HTMLImageElement[] = []
+	names: HTMLParagraphElement[] = []
 	resetImages(amountOfMembers: number) {
 		for(let image of this.images){
 			image.remove()
@@ -47,9 +48,10 @@ export class DisplayComponent implements OnInit {
 		this.images = []
 		for(let i = 0; i < amountOfMembers; ++i) {
 
-			let img: HTMLImageElement = document.createElement('img')
-
+			const img: HTMLImageElement = document.createElement('img')
 			this.applyStyles(img)
+			// const name: HTMLParagraphElement = document.createElement('p')
+			// name.innerHTML = 
 			
 			this.videoBox.nativeElement.appendChild(img)
 			this.images.push(img)
@@ -63,14 +65,14 @@ export class DisplayComponent implements OnInit {
 		img.alt = ''
 		img.style.borderWidth = '1rem'
 		
-		if(this.frames.length <= this.maxParticipantsPerRow) {
+		if(this.framesAndNames.length <= this.maxParticipantsPerRow) {
 			// there is ony 1 row
-			img.style.width = `${100 / this.frames.length}%`
+			img.style.width = `${100 / this.framesAndNames.length}%`
 			img.style.maxHeight = '100%'
 		} else {
 			// there are multiple rows
 			img.style.width = `${100 / this.maxParticipantsPerRow}%`
-			const amountOfRows = this.frames.length / this.maxParticipantsPerRow
+			const amountOfRows = this.framesAndNames.length / this.maxParticipantsPerRow
 			img.style.maxHeight = `${100 / amountOfRows}%`
 		}
 

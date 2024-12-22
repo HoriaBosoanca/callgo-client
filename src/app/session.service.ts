@@ -19,7 +19,7 @@ export class SessionService {
 
 	public stableMembers: any[] = []
 
-	async getAllIDs(hostID: string): Promise<number[]> {
+	async getAllMembers(hostID: string): Promise<number[]> {
 		let sessionObj = await this.apiService.getSession(hostID).toPromise();
 		this.hostDisplayName = sessionObj.host.name
 		let members: any[] = sessionObj.members
@@ -37,14 +37,17 @@ export class SessionService {
 	}
 
 	// video frame mangement 
-	async requestFrames(): Promise<string[]> {
-		let members: any[] = await this.getAllIDs(this.hostID)
-		let frames: string[] = []
+	async requestFramesAndNames(): Promise<string[]> {
+		let members: any[] = await this.getAllMembers(this.hostID)
+		let framesAndNames: any[] = []
 		for(let member of members) {
 			let videoFrame = await this.apiService.getVideo(this.hostID, member.ID).toPromise()
-			frames.push(videoFrame.video)
+			framesAndNames.push({
+				"video": videoFrame.video,
+				"name": member.name
+			})
 		}
-		return frames
+		return framesAndNames
 	}
 
 }
