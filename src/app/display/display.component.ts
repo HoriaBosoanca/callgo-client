@@ -1,6 +1,6 @@
-import { Component, ElementRef, OnInit, ViewChild, Renderer2 } from '@angular/core';
-import { SessionService } from '../session.service';
-import { CommonModule } from '@angular/common';
+import { Component, ElementRef, OnInit, ViewChild, Renderer2 } from '@angular/core'
+import { SessionService } from '../session.service'
+import { CommonModule } from '@angular/common'
 
 @Component({
   selector: 'app-display',
@@ -10,73 +10,89 @@ import { CommonModule } from '@angular/common';
   styleUrl: './display.component.css'
 })
 export class DisplayComponent implements OnInit {
-	constructor(private sessionService: SessionService, private renderer: Renderer2) {}
+	constructor(private sessionService: SessionService) {}
 
 	@ViewChild('videoBox') videoBox!: ElementRef
 
 	framesAndNames: any[] = []
 	async ngOnInit(): Promise<void> {
 		const timer = setInterval(async () => {
-			let oldAmountOfMembers = this.framesAndNames.length
-			this.framesAndNames = await this.sessionService.requestFramesAndNames()
-			if(oldAmountOfMembers != this.framesAndNames.length) {
-				this.resetImages(this.framesAndNames.length)
+			let oldAmountOfMembers = this.framesAndNames.length;
+			this.framesAndNames = await this.sessionService.requestFramesAndNames();
+	
+			// Reset images only if the number of members changes
+			if (oldAmountOfMembers !== this.framesAndNames.length) {
+				this.resetImages(this.framesAndNames.length);
 			}
-
-			if(!this.correctImagesGenerated) {
-				this.resetImages(this.framesAndNames.length)
-			}
-
-			for(let i = 0; i < this.images.length; ++i) {
-				this.images[i].src = this.framesAndNames[i].video
-				console.log(this.framesAndNames[i].name)
-				if(this.images[i].src == 'data:,') {
-					this.images[i].src = '../../assets/images/black.png'
+	
+			for (let i = 0; i < this.images.length; ++i) {
+				const frame = this.framesAndNames[i];
+				const img = this.images[i];
+				const name = this.names[i];
+				img.src = frame.video;
+				if (img.src == 'data:,' || img.src == '../../assets/images/black.png') {
+					img.src = '../../assets/images/black.png'
+					name.style.top = '50%'
+					name.style.fontWeight = 'bold'
+				} else {
+					name.style.top = '90%'
+					name.style.fontWeight = 'normal'
 				}
+				name.innerHTML = frame.name || 'Unknown';
 			}
-			
-		}, this.sessionService.delay)
-	}
+		}, this.sessionService.delay);
+	}	
 	
 	correctImagesGenerated: boolean = false
 	images: HTMLImageElement[] = []
 	names: HTMLParagraphElement[] = []
 	resetImages(amountOfMembers: number) {
-		for(let image of this.images){
-			image.remove()
-		}
+		// Clear existing elements
+		this.videoBox.nativeElement.innerHTML = '' // Clear all child elements
 		this.images = []
-		for(let i = 0; i < amountOfMembers; ++i) {
-
-			const img: HTMLImageElement = document.createElement('img')
-			this.applyStyles(img)
-			// const name: HTMLParagraphElement = document.createElement('p')
-			// name.innerHTML = 
+		this.names = []
+	
+		// Create new elements
+		for (let i = 0; i < amountOfMembers; ++i) {
+			// values
+			const maxParticipantsPerRow = 4
+			const participantCount = this.framesAndNames.length
+			const widthPercent = 100 / Math.min(participantCount, maxParticipantsPerRow) - 1
 			
-			this.videoBox.nativeElement.appendChild(img)
+			// Create div
+			const div: HTMLDivElement = document.createElement('div')
+			div.style.width = `${widthPercent}%`
+			div.style.position = 'relative'
+			div.style.display = 'flex'
+			div.style.maxWidth = '50%'
+			div.style.margin = 'auto'
+			
+			// Create image
+			const img: HTMLImageElement = document.createElement('img')
+			img.alt = ''
+			img.style.margin = 'auto'
+			img.style.borderWidth = '1rem'
+			img.style.width = '100%'
+			img.style.objectFit = 'contain'
+			img.style.borderRadius = '1vh'
+	
+			// Create name overlay
+			const name: HTMLParagraphElement = document.createElement('p')
+			name.style.top = '50%'
+			name.style.position = 'absolute'
+			name.style.left = '50%'
+			name.style.transform = 'translate(-50%, -50%)'
+			name.style.color = 'white'
+			name.style.fontSize = '1.5rem'
+	
+			// Append elements
+			div.appendChild(img)
+			div.appendChild(name)
+			this.videoBox.nativeElement.appendChild(div)
+	
 			this.images.push(img)
+			this.names.push(name)
 			this.correctImagesGenerated = true
 		}
-	}
-	
-	maxParticipantsPerRow: number = 4
-	applyStyles(img: HTMLImageElement) {
-		img.style.margin = 'auto'
-		img.alt = ''
-		img.style.borderWidth = '1rem'
-		
-		if(this.framesAndNames.length <= this.maxParticipantsPerRow) {
-			// there is ony 1 row
-			img.style.width = `${100 / this.framesAndNames.length}%`
-			img.style.maxHeight = '100%'
-		} else {
-			// there are multiple rows
-			img.style.width = `${100 / this.maxParticipantsPerRow}%`
-			const amountOfRows = this.framesAndNames.length / this.maxParticipantsPerRow
-			img.style.maxHeight = `${100 / amountOfRows}%`
-		}
-
-		img.style.objectFit = 'contain'
-		img.style.borderRadius = '1vh'
-	}
+	}	
 }
