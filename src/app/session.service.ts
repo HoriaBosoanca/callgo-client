@@ -38,6 +38,9 @@ export class SessionService {
 
 	// video frame mangement 
 	async requestFramesAndNames(): Promise<string[]> {
+		if(this.hostID == 'null' && localStorage.getItem('hostID') != null) {
+			this.hostID = localStorage.getItem('hostID')!
+		}
 		let members: any[] = await this.getAllMembers(this.hostID)
 		let framesAndNames: any[] = []
 		for(let member of members) {
@@ -49,5 +52,4 @@ export class SessionService {
 		}
 		return framesAndNames
 	}
-
 }

@@ -49,7 +49,9 @@ export class CameraComponent implements OnInit {
 	// Start capturing and sending video data
 	async send(): Promise<void> {
 		try {
-			await this.apiService.postVideo(this.createVideoFrame(), this.sessionService.hostID, this.sessionService.myID).toPromise();
+			const frame = this.createVideoFrame()
+			console.log(frame)
+			await this.apiService.postVideo(frame, this.sessionService.hostID, this.sessionService.myID).toPromise();
 		} catch (error) {
 			console.error('Error uploading video chunk:', error);
 		}

@@ -33,6 +33,10 @@ export class MenuComponent implements OnInit {
 	
 			this.sessionService.displayName = this.displayNameCreate
 			this.router.navigate(['/video'])
+			
+			if(this.sessionService.hostID != 'null') {
+				localStorage.setItem('hostID', this.sessionService.hostID)
+			}
 		} else {
 			this.nameInputCreate.nativeElement.style.borderColor = 'red'
 			console.log("Empty name")

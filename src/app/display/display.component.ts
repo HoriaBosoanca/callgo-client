@@ -29,6 +29,7 @@ export class DisplayComponent implements OnInit {
 				const frame = this.framesAndNames[i];
 				const img = this.images[i];
 				const name = this.names[i];
+
 				img.src = frame.video;
 				if (img.src == 'data:,' || img.src == '../../assets/images/black.png') {
 					img.src = '../../assets/images/black.png'
