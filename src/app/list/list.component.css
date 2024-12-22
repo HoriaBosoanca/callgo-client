@@ -1,13 +1,8 @@
 .list-item{
-    margin-top: -1.5vh;
-    
     background-color: rgb(85, 156, 38);
     
     width: 100%;
-    height: 7vh;
     border-radius: 1vh;
-
-    display: flex;
 }
 
 .text{
