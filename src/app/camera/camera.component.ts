@@ -50,7 +50,6 @@ export class CameraComponent implements OnInit {
 	async send(): Promise<void> {
 		try {
 			const frame = this.createVideoFrame()
-			console.log(frame)
 			await this.apiService.postVideo(frame, this.sessionService.hostID, this.sessionService.myID).toPromise();
 		} catch (error) {
 			console.error('Error uploading video chunk:', error);
@@ -63,7 +62,7 @@ export class CameraComponent implements OnInit {
 		this.canvas.width = this.videoElement.videoWidth;
 		this.canvas.height = this.videoElement.videoHeight;
 		const context = this.canvas.getContext('2d');
-		context?.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height);
+		context?.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height)
 		return this.canvas.toDataURL('image/jpeg');
 	}
 

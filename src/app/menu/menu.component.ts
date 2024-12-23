@@ -34,9 +34,9 @@ export class MenuComponent implements OnInit {
 			this.sessionService.displayName = this.displayNameCreate
 			this.router.navigate(['/video'])
 			
-			if(this.sessionService.hostID != 'null') {
-				localStorage.setItem('hostID', this.sessionService.hostID)
-			}
+			// persistently store host ID and my ID
+			localStorage.setItem('hostID', this.sessionService.hostID)
+			localStorage.setItem('myID', this.sessionService.myID)
 		} else {
 			this.nameInputCreate.nativeElement.style.borderColor = 'red'
 			console.log("Empty name")
@@ -48,6 +48,10 @@ export class MenuComponent implements OnInit {
 		if(this.displayNameJoin != "" && this.meetingID != "") {
 			this.sessionService.myID = await this.apiService.joinSession(this.meetingID, this.displayNameJoin).toPromise()
 			this.sessionService.hostID = this.meetingID
+
+			// persistently store host ID and my ID
+			localStorage.setItem('hostID', this.sessionService.hostID)
+			localStorage.setItem('myID', this.sessionService.myID)
 		} else {
 			this.nameInputJoin.nativeElement.style.borderColor = 'red'
 			this.joinInput.nativeElement.style.borderColor = 'red'

@@ -9,7 +9,7 @@ export class SessionService {
 	constructor(private apiService: ApiService, private router: Router) { }
 
 	// constants
-	public delay: number = 100 
+	public delay: number = 200 
 
 	// session management
 	public hostID: string = "null"
@@ -38,8 +38,10 @@ export class SessionService {
 
 	// video frame mangement 
 	async requestFramesAndNames(): Promise<string[]> {
-		if(this.hostID == 'null' && localStorage.getItem('hostID') != null) {
+		// if page was just refreshed, retrieve saved host ID and my ID
+		if(this.hostID == 'null' && localStorage.getItem('hostID') != null && localStorage.getItem('myID') != null) {
 			this.hostID = localStorage.getItem('hostID')!
+			this.myID = localStorage.getItem('myID')!
 		}
 		let members: any[] = await this.getAllMembers(this.hostID)
 		let framesAndNames: any[] = []
