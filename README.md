@@ -24,4 +24,4 @@ Make all operations blocking (await them) and only do 1 POST every 1 GET so vide
 Group videos into sessions (meetings) \
 Fix a bug where 'ngFor' reloads the entire image element instead of only it's source \
 Display every member's video on a decent UI, with display names as overlays and make a list of IDs component for debugging \
-Use session storage so the app can be refreshed withoud leaving the meeting \
+Use session storage so the app can be refreshed withoud leaving the meeting
