@@ -39,13 +39,14 @@ export class SessionService {
 	// video frame mangement 
 	async requestFramesAndNames(): Promise<string[]> {
 		// if page was just refreshed, retrieve saved host ID and my ID
-		if(this.hostID == 'null' && localStorage.getItem('hostID') != null && localStorage.getItem('myID') != null) {
-			this.hostID = localStorage.getItem('hostID')!
-			this.myID = localStorage.getItem('myID')!
+		if(this.hostID == 'null' && sessionStorage.getItem('hostID') != null && sessionStorage.getItem('myID') != null) {
+			this.hostID = sessionStorage.getItem('hostID')!
+			this.myID = sessionStorage.getItem('myID')!
 		}
 		let members: any[] = await this.getAllMembers(this.hostID)
 		let framesAndNames: any[] = []
 		for(let member of members) {
+			console.log(member.ID)
 			let videoFrame = await this.apiService.getVideo(this.hostID, member.ID).toPromise()
 			framesAndNames.push({
 				"video": videoFrame.video,
