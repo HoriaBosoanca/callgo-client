@@ -15,8 +15,8 @@ export class ApiService {
     });
   }
 
-  private apiUrl = 'https://callgo-server-386137910114.europe-west3.run.app'
-  // private apiUrl = 'https://horia.live:8443'
+  // private apiUrl = 'https://callgo-server-386137910114.europe-west3.run.app'
+  private apiUrl = 'https://horia.live:8443'
 
   // VIDEO
   postVideo(videoData: string, sessionID: string, memberID: string): Observable<any> {
