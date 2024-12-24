@@ -36,7 +36,7 @@ export class SessionService {
 
 		return members;
 	}
-	
+
 	async requestFramesAndNames(): Promise<string[]> {
 		// if page was just refreshed, retrieve saved host ID and my ID
 		if(this.hostID == 'null' && sessionStorage.getItem('hostID') != null && sessionStorage.getItem('myID') != null) {
@@ -78,6 +78,7 @@ export class SessionService {
 	// === leave / kick ===
 	async leaveMeeting(memberID: string) {
 		await this.apiService.leaveSession(this.hostID, memberID).toPromise()
-		this.router.navigate(['/menu'])
+		// kicking someone else would redirect yourself
+		// this.router.navigate(['/menu'])
 	}
 }

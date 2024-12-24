@@ -7,9 +7,9 @@ The live app is [here](https://callgo-client.vercel.app/menu).
 
 ## Todo
 ### Soon
-Implement meeting join request / leave / kick features \
 Make some performance tests and save progress on a branch (CPU, RAM) \
-Use websockets (currently using http) \
+Use websockets for videoData (currently using http) \
+Use websockets to do contious checks --> kicks + redirects, join requests \
 Compare performance, make new branch \
 Optimize backend (goroutines, []byte instead of string, run multiple instances) + use simpler IDs \
 Compare performance, make new branch \
@@ -27,4 +27,5 @@ Group videos into sessions (meetings) \
 Fix a bug where 'ngFor' reloads the entire image element instead of only it's source \
 Display every member's video on a decent UI, with display names as overlays and make a component with a list of IDs for debugging \
 Use session storage so the app can be refreshed without leaving the meeting \
-Moved API from Google Cloud to Raspberry PI
+Moved API from Google Cloud to Raspberry PI \
+Implement leave / kick feature 
