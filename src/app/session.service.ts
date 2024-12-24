@@ -77,7 +77,10 @@ export class SessionService {
 
 	// === leave / kick ===
 	async leaveMeeting(memberID: string) {
-		await this.apiService.leaveSession(this.hostID, memberID).toPromise()
+		// this should be done on the server but whatever (i don't want to add a third urlParam and hide IDs from members)
+		if(this.myID == this.hostID) {
+			await this.apiService.leaveSession(this.hostID, memberID).toPromise()
+		}
 		// kicking someone else would redirect yourself
 		// this.router.navigate(['/menu'])
 	}
