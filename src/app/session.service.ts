@@ -9,7 +9,7 @@ export class SessionService {
 	constructor(private apiService: ApiService, private router: Router) { }
 
 	// constants
-	public delay: number = 100 
+	public delay: number = 500 
 
 	// session management
 	public hostID: string = "null"
