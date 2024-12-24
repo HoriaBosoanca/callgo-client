@@ -17,6 +17,11 @@ export class DisplayComponent implements OnInit {
 	framesAndNames: any[] = []
 	async ngOnInit(): Promise<void> {
 		const timer = setInterval(async () => {
+			// stop if someone leaves meeting
+			if(!window.location.href.includes('video')) {
+				clearInterval(timer)
+			}
+
 			let oldAmountOfMembers = this.framesAndNames.length;
 			this.framesAndNames = await this.sessionService.requestFramesAndNames();
 	
@@ -84,7 +89,7 @@ export class DisplayComponent implements OnInit {
 			name.style.left = '50%'
 			name.style.transform = 'translate(-50%, -50%)'
 			name.style.color = 'white'
-			name.style.fontSize = '1.5rem'
+			name.style.fontSize = '1.5vh'
 	
 			// Append elements
 			div.appendChild(img)

@@ -28,30 +28,16 @@ export class MenuComponent implements OnInit {
 
 	async startMeeting() {
 		if(this.displayNameCreate != "") {
-			this.sessionService.myID = await this.apiService.createSession(this.displayNameCreate).toPromise()
-			this.sessionService.hostID = this.sessionService.myID
-	
-			this.sessionService.displayName = this.displayNameCreate
-			this.router.navigate(['/video'])
-			
-			// persistently store host ID and my ID
-			sessionStorage.setItem('hostID', this.sessionService.hostID)
-			sessionStorage.setItem('myID', this.sessionService.myID)
+			await this.sessionService.startMeeting(this.displayNameCreate)
 		} else {
 			this.nameInputCreate.nativeElement.style.borderColor = 'red'
 			console.log("Empty name")
 		}
 	}
-
 	
 	async joinMeeting() {
 		if(this.displayNameJoin != "" && this.meetingID != "") {
-			this.sessionService.myID = await this.apiService.joinSession(this.meetingID, this.displayNameJoin).toPromise()
-			this.sessionService.hostID = this.meetingID
-
-			// persistently store host ID and my ID
-			sessionStorage.setItem('hostID', this.sessionService.hostID)
-			sessionStorage.setItem('myID', this.sessionService.myID)
+			await this.sessionService.joinMeeting(this.meetingID, this.displayNameJoin)
 		} else {
 			this.nameInputJoin.nativeElement.style.borderColor = 'red'
 			this.joinInput.nativeElement.style.borderColor = 'red'

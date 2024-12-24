@@ -39,4 +39,8 @@ export class ApiService {
   getSession(hostID: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/session/${hostID}`, { headers: this.getHeaders() });
   }
+
+  leaveSession(hostID: string, memberID: string) {
+    return this.http.delete(`${this.apiUrl}/session/${hostID}/${memberID}`, { headers: this.getHeaders() })
+  }
 }

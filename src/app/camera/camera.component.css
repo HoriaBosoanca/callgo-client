@@ -34,3 +34,20 @@
 .iobutton:hover{
     background-color: rgb(60, 255, 0);
 }
+
+.dropdown{
+    position: fixed;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    background-color: rgb(85, 156, 38);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: top 0.5s ease-in-out;
+    z-index: 1000;
+    border-bottom-right-radius: 1vh;
+    border-bottom-left-radius: 1vh;
+}
+
+.dropdown.show{
+    top: 0%;
+}

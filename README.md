@@ -7,11 +7,11 @@ The live app is [here](https://callgo-client.vercel.app/menu).
 
 ## Todo
 ### Soon
-Implement meeting join request / kick features \
+Implement meeting join request / leave / kick features \
 Make some performance tests and save progress on a branch (CPU, RAM) \
 Use websockets (currently using http) \
 Compare performance, make new branch \
-Optimize backend (goroutines, []byte instead of string, run multiple instances) \
+Optimize backend (goroutines, []byte instead of string, run multiple instances) + use simpler IDs \
 Compare performance, make new branch \
 Link client to domain
 ### Later

@@ -9,7 +9,7 @@ export class SessionService {
 	constructor(private apiService: ApiService, private router: Router) { }
 
 	// constants
-	public delay: number = 200 
+	public delay: number = 500 
 
 	// session management
 	public hostID: string = "null"
@@ -19,6 +19,7 @@ export class SessionService {
 
 	public stableMembers: any[] = []
 
+	// === video data ===
 	async getAllMembers(hostID: string): Promise<number[]> {
 		let sessionObj = await this.apiService.getSession(hostID).toPromise();
 		this.hostDisplayName = sessionObj.host.name
@@ -35,8 +36,7 @@ export class SessionService {
 
 		return members;
 	}
-
-	// video frame mangement 
+	
 	async requestFramesAndNames(): Promise<string[]> {
 		// if page was just refreshed, retrieve saved host ID and my ID
 		if(this.hostID == 'null' && sessionStorage.getItem('hostID') != null && sessionStorage.getItem('myID') != null) {
@@ -46,7 +46,6 @@ export class SessionService {
 		let members: any[] = await this.getAllMembers(this.hostID)
 		let framesAndNames: any[] = []
 		for(let member of members) {
-			console.log(member.ID)
 			let videoFrame = await this.apiService.getVideo(this.hostID, member.ID).toPromise()
 			framesAndNames.push({
 				"video": videoFrame.video,
@@ -54,5 +53,31 @@ export class SessionService {
 			})
 		}
 		return framesAndNames
+	}
+
+	// === join / create ===
+	async startMeeting(displayName: string) {
+		this.myID = await this.apiService.createSession(displayName).toPromise()
+		this.hostID = this.myID
+
+		this.displayName = this.displayName
+		this.router.navigate(['/video'])
+		// persistently store host ID and my ID
+		sessionStorage.setItem('hostID', this.hostID)
+		sessionStorage.setItem('myID', this.myID)
+	}
+
+	async joinMeeting(meetingID: string, displayName: string) {
+		this.myID = await this.apiService.joinSession(meetingID, displayName).toPromise()
+		this.hostID = meetingID
+		// persistently store host ID and my ID
+		sessionStorage.setItem('hostID', this.hostID)
+		sessionStorage.setItem('myID', this.myID)
+	}
+
+	// === leave / kick ===
+	async leaveMeeting(memberID: string) {
+		await this.apiService.leaveSession(this.hostID, memberID).toPromise()
+		this.router.navigate(['/menu'])
 	}
 }

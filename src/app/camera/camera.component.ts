@@ -18,6 +18,11 @@ export class CameraComponent implements OnInit {
 
 	async ngOnInit() {
 		const timer = setInterval(async () => {
+			// stop if someone leaves meeting
+			if(!window.location.href.includes('video')) {
+				clearInterval(timer)
+			}
+
 			await this.send();
 		}, this.sessionService.delay)
 	}
@@ -69,5 +74,6 @@ export class CameraComponent implements OnInit {
 	listIsDisplayed = false
 	toggleList() {
 		this.listIsDisplayed = !this.listIsDisplayed
+		document.getElementById('dropdown')!.classList.toggle('show')
 	}
 }

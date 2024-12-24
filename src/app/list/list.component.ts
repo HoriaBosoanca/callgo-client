@@ -10,4 +10,8 @@ import { CommonModule } from '@angular/common';
 })
 export class ListComponent {
 	constructor(public sessionService: SessionService) {}
+
+	async kickMember(memberID: string) {
+		await this.sessionService.leaveMeeting(memberID)
+	}
 }
