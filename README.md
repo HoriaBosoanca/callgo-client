@@ -7,14 +7,11 @@ The live app is [here](https://callgo-client.vercel.app/menu).
 
 ## Todo
 ### Soon
-Optimize backend (goroutines, []byte instead of string, run multiple instances) + use simpler IDs \
-Use websockets for videoData (currently using http) \
+Replace all http with websockets, optimize backend with goroutines \
 Use websockets to do contious checks --> kicks + redirects, join requests \
-Test performance \
 Link client to domain
 ### Later
 Use WebRTC \
-Compare performance \
 Microphone support \
 Share screen support
 
