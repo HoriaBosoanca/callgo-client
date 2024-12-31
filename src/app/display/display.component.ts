@@ -23,7 +23,7 @@ export class DisplayComponent implements OnInit {
 			}
 
 			let oldAmountOfMembers = this.framesAndNames.length;
-			this.framesAndNames = await this.sessionService.requestFramesAndNames();
+			// this.framesAndNames = await this.sessionService.requestFramesAndNames();
 	
 			// Reset images only if the number of members changes
 			if (oldAmountOfMembers !== this.framesAndNames.length) {

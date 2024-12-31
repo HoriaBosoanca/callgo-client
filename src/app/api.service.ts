@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 
 @Injectable({
 providedIn: 'root'
@@ -17,51 +17,59 @@ constructor(private http: HttpClient) { }
 
 	// private apiUrl = 'https://callgo-server-386137910114.europe-west3.run.app'
 	// private apiUrl = 'https://horia.live:8443'
-	private apiUrl = 'http://localhost:1234'
+	private httpUrl = 'http://localhost:1234'
 	private webSocketUrl = 'ws://localhost:1234/ws'
 
-	// VIDEO
-	postVideo(videoData: string, sessionID: string, memberID: string): Observable<any> {
-		return this.http.post(`${this.apiUrl}/video/${sessionID}/${memberID}`, { video: videoData }, { headers: this.getHeaders() });
+	// http
+	createSession(displayName: string): Promise<any> {
+		return lastValueFrom(this.http.post(`${this.httpUrl}/initialize`, { headers: this.getHeaders() }))
 	}
 
-	getVideo(sessionID: string, memberID: string): Observable<any> {
-		return this.http.get(`${this.apiUrl}/video/${sessionID}/${memberID}`, { headers: this.getHeaders() });
+	kickSession(sessionID: string, memberID: string, password: string) {
+		return this.http.post(`${this.httpUrl}/disconnect`, {"sessionID":`${sessionID}`,"memberID":`${memberID}`,"password":`${password}`}, { headers: this.getHeaders() })
 	}
 
-	// SESSION
-	createSession(displayName: string): Observable<any> {
-		return this.http.post(`${this.apiUrl}/session`, {"name":displayName}, { headers: this.getHeaders() });
-	}
-
-	joinSession(hostID: string, displayName: string): Observable<any> {
-		return this.http.post(`${this.apiUrl}/session/${hostID}`, {"name":displayName}, { headers: this.getHeaders() });
-	}
-
-	getSession(hostID: string): Observable<any> {
-		return this.http.get(`${this.apiUrl}/session/${hostID}`, { headers: this.getHeaders() });
-	}
-
-	leaveSession(hostID: string, memberID: string) {
-		return this.http.delete(`${this.apiUrl}/session/${hostID}/${memberID}`, { headers: this.getHeaders() })
-	}
-
+	// websocket
 	private webSocket!: WebSocket
 	
-	connect() {
-		this.webSocket = new WebSocket(this.webSocketUrl)	
-		
-		this.webSocket.onopen = () => {}
-		this.webSocket.onmessage = (message) => {}
-		this.webSocket.onclose = () => {}
+	connect(sessionID: string) {
+		this.webSocket = new WebSocket(`${this.webSocketUrl}?sessionID=${sessionID}`);
+	
+		this.webSocket.onopen = (event: Event) => {
+			console.log('WebSocket connection established');
+		};
+	
+		this.webSocket.onmessage = (message: MessageEvent) => {
+			console.log('Message received:', message.data);
+			
+			try {
+				const data = JSON.parse(message.data);
+				if (data.memberID) {
+					const myID: string = data.memberID;
+					sessionStorage.setItem("myID", myID);
+					console.log('Member ID set:', myID);
+				}
+			} catch (error) {
+				console.error('Error parsing message:', error);
+			}
+		};
+	
+		this.webSocket.onclose = () => {
+			console.log('WebSocket connection closed');
+		};
+	
 		this.webSocket.onerror = (error) => {
-			console.error(error)
-		}
-	}
+			console.error('WebSocket error:', error);
+		};
+	}	
 
-	sendMessage(message: any) {
+	sendMessage(name: string, ID: string, video: string) {
 		if (this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
-			this.webSocket.send(JSON.stringify(message));
+			this.webSocket.send(JSON.stringify({
+				"name":`${name}`,
+				"ID":`${ID}`,
+				"video":`${video}`
+			}));
 		} else {
 			console.error('WebSocket is not open. Unable to send message.');
 		}

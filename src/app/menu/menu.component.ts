@@ -29,6 +29,7 @@ export class MenuComponent implements OnInit {
 	async startMeeting() {
 		if(this.displayNameCreate != "") {
 			await this.sessionService.startMeeting(this.displayNameCreate)
+			this.sessionService.joinMeeting(sessionStorage.getItem("myID")!, this.displayNameCreate)
 		} else {
 			this.nameInputCreate.nativeElement.style.borderColor = 'red'
 			console.log("Empty name")
@@ -37,7 +38,7 @@ export class MenuComponent implements OnInit {
 	
 	async joinMeeting() {
 		if(this.displayNameJoin != "" && this.meetingID != "") {
-			await this.sessionService.joinMeeting(this.meetingID, this.displayNameJoin)
+			this.sessionService.joinMeeting(this.meetingID, this.displayNameJoin)
 		} else {
 			this.nameInputJoin.nativeElement.style.borderColor = 'red'
 			this.joinInput.nativeElement.style.borderColor = 'red'

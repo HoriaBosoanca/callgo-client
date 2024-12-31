@@ -2,15 +2,15 @@
 This is the client for a video call app that I made as a personal project (with the Angular framework and the Go standard library)
 
 ## Links
-The repo for the server is [here](https://github.com/HoriaBosoanca/callgo-server). \
+The repo for the server is [here](https://github.com/HoriaBosoanca/callgo-server-ws). \
 The live app is [here](https://callgo-client.vercel.app/menu).
 
 ## Todo
 ### Soon
-Replace all http with websockets, optimize backend with goroutines \
-Use websockets to do contious checks --> kicks + redirects, join requests \
-Link client to domain
+Rewire client to new server \
+Move client to rpi and link it to domain 
 ### Later
+Implement join request feature, optimize backend with goroutines \
 Use WebRTC \
 Microphone support \
 Share screen support
@@ -24,3 +24,4 @@ Display every member's video on a decent UI, with display names as overlays and 
 Use session storage so the app can be refreshed without leaving the meeting \
 Moved API from Google Cloud to Raspberry PI \
 Implement leave / kick feature 
+Rewrite server with websockets \
