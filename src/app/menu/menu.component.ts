@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../api.service';
-import { SessionService } from '../session.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -12,7 +11,7 @@ import { Router } from '@angular/router';
 	styleUrl: './menu.component.css'
 })
 export class MenuComponent implements OnInit {
-	constructor(private router: Router, private apiService: ApiService, private sessionService: SessionService ) {}
+	constructor(private router: Router, private apiService: ApiService) {}
 	
 	ngOnInit(): void {}
 	
@@ -28,23 +27,21 @@ export class MenuComponent implements OnInit {
 
 	async startMeeting() {
 		if(this.displayNameCreate != "") {
-			await this.sessionService.startMeeting(this.displayNameCreate)
-			this.sessionService.joinMeeting(sessionStorage.getItem("myID")!, this.displayNameCreate)
+			await this.apiService.startMeeting()
+			this.apiService.joinMeeting(sessionStorage.getItem("sessionID")!, this.displayNameCreate)
 		} else {
 			this.nameInputCreate.nativeElement.style.borderColor = 'red'
 			console.log("Empty name")
 		}
 	}
 	
-	async joinMeeting() {
+	joinMeeting() {
 		if(this.displayNameJoin != "" && this.meetingID != "") {
-			this.sessionService.joinMeeting(this.meetingID, this.displayNameJoin)
+			this.apiService.joinMeeting(this.meetingID, this.displayNameJoin)
 		} else {
 			this.nameInputJoin.nativeElement.style.borderColor = 'red'
 			this.joinInput.nativeElement.style.borderColor = 'red'
 			throw new Error("Empty name or ID")
 		}
-		this.sessionService.displayName = this.displayNameJoin
-		this.router.navigate(['/video'])
 	}
 }

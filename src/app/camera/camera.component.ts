@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../api.service';
-import { SessionService } from '../session.service';
 import { DisplayComponent } from '../display/display.component';
 import { ListComponent } from '../list/list.component';
 
@@ -14,7 +13,7 @@ import { ListComponent } from '../list/list.component';
   styleUrls: ['./camera.component.css']
 })
 export class CameraComponent implements OnInit {
-	constructor(private apiService: ApiService, private sessionService: SessionService) {}
+	constructor(private apiService: ApiService) {}
 
 	async ngOnInit() {
 		const timer = setInterval(async () => {
@@ -24,7 +23,7 @@ export class CameraComponent implements OnInit {
 			}
 
 			await this.send();
-		}, this.sessionService.delay)
+		}, this.apiService.delay)
 	}
 
 	videoElement: HTMLVideoElement = document.createElement('video')

@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild, Renderer2 } from '@angular/core'
-import { SessionService } from '../session.service'
 import { CommonModule } from '@angular/common'
+import { ApiService } from '../api.service'
 
 @Component({
   selector: 'app-display',
@@ -10,11 +10,12 @@ import { CommonModule } from '@angular/common'
   styleUrl: './display.component.css'
 })
 export class DisplayComponent implements OnInit {
-	constructor(private sessionService: SessionService) {}
+	constructor(private apiService: ApiService) {}
 
 	@ViewChild('videoBox') videoBox!: ElementRef
 
-	framesAndNames: any[] = []
+	private oldAmountOfMembers = 0
+	
 	async ngOnInit(): Promise<void> {
 		const timer = setInterval(async () => {
 			// stop if someone leaves meeting
@@ -22,20 +23,19 @@ export class DisplayComponent implements OnInit {
 				clearInterval(timer)
 			}
 
-			let oldAmountOfMembers = this.framesAndNames.length;
-			// this.framesAndNames = await this.sessionService.requestFramesAndNames();
-	
 			// Reset images only if the number of members changes
-			if (oldAmountOfMembers !== this.framesAndNames.length) {
-				this.resetImages(this.framesAndNames.length);
+			if (this.oldAmountOfMembers !== this.apiService.stableMembers.length) {
+				this.resetImages(this.apiService.stableMembers.length);
 			}
+
+			this.oldAmountOfMembers = this.apiService.stableMembers.length
 	
 			for (let i = 0; i < this.images.length; ++i) {
-				const frame = this.framesAndNames[i];
+				const videoDataTransfer = this.apiService.stableMembers[i];
 				const img = this.images[i];
 				const name = this.names[i];
 
-				img.src = frame.video;
+				img.src = videoDataTransfer.video;
 				if (img.src == 'data:,' || img.src == '../../assets/images/black.png') {
 					img.src = '../../assets/images/black.png'
 					name.style.top = '50%'
@@ -44,9 +44,9 @@ export class DisplayComponent implements OnInit {
 					name.style.top = '90%'
 					name.style.fontWeight = 'normal'
 				}
-				name.innerHTML = frame.name || 'Unknown';
+				name.innerHTML = videoDataTransfer.name || 'Unknown';
 			}
-		}, this.sessionService.delay);
+		}, this.apiService.delay);
 	}	
 	
 	correctImagesGenerated: boolean = false
@@ -62,8 +62,7 @@ export class DisplayComponent implements OnInit {
 		for (let i = 0; i < amountOfMembers; ++i) {
 			// values
 			const maxParticipantsPerRow = 4
-			const participantCount = this.framesAndNames.length
-			const widthPercent = 100 / Math.min(participantCount, maxParticipantsPerRow) - 1
+			const widthPercent = 100 / Math.min(amountOfMembers, maxParticipantsPerRow) - 1
 			
 			// Create div
 			const div: HTMLDivElement = document.createElement('div')

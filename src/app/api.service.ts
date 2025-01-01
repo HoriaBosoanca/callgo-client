@@ -1,18 +1,38 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { lastValueFrom, Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { Injectable } from '@angular/core'
+import { lastValueFrom, Observable } from 'rxjs'
+import { Router } from '@angular/router';
 
 @Injectable({
 providedIn: 'root'
 })
 export class ApiService {
 
-constructor(private http: HttpClient) { }
+	constructor(private http: HttpClient, private router: Router) { }
 
 	private getHeaders(): HttpHeaders {
 		return new HttpHeaders({
 		'Content-Type': 'application/json'
-		});
+		})
+	}
+
+	// constants
+	public delay: number = 25
+
+	// === join / create ===
+	async startMeeting() {
+		const obj: any = await this.createSession()
+		const sessionID = obj.sessionID
+		const password = obj.password
+		sessionStorage.setItem('sessionID', sessionID)
+		sessionStorage.setItem('password', password)
+	}
+	
+	joinMeeting(sessionID: string, displayName: string) {
+		this.connect(sessionID)
+		sessionStorage.setItem('sessionID', sessionID)
+		sessionStorage.setItem("myName", displayName)
+		this.router.navigate(['/video'])
 	}
 
 	// private apiUrl = 'https://callgo-server-386137910114.europe-west3.run.app'
@@ -21,46 +41,51 @@ constructor(private http: HttpClient) { }
 	private webSocketUrl = 'ws://localhost:1234/ws'
 
 	// http
-	createSession(displayName: string): Promise<any> {
+	createSession(): Promise<any> {
 		return lastValueFrom(this.http.post(`${this.httpUrl}/initialize`, { headers: this.getHeaders() }))
 	}
 
-	kickSession(sessionID: string, memberID: string, password: string) {
-		return this.http.post(`${this.httpUrl}/disconnect`, {"sessionID":`${sessionID}`,"memberID":`${memberID}`,"password":`${password}`}, { headers: this.getHeaders() })
+	kickSession(sessionID: string, memberID: string, password: string): Promise<any> {
+		return lastValueFrom(this.http.post(`${this.httpUrl}/disconnect`, {"sessionID":`${sessionID}`,"memberID":`${memberID}`,"password":`${password}`}, { headers: this.getHeaders() }))
 	}
 
 	// websocket
 	private webSocket!: WebSocket
+
+	// members cache
+	public stableMembers: any[] = []
 	
 	connect(sessionID: string) {
-		this.webSocket = new WebSocket(`${this.webSocketUrl}?sessionID=${sessionID}`);
+		console.log(sessionID)
+
+		this.webSocket = new WebSocket(`${this.webSocketUrl}?sessionID=${sessionID}`)
 	
 		this.webSocket.onopen = (event: Event) => {
-			console.log('WebSocket connection established');
-		};
+			console.log('WebSocket connection established')
+		}
 	
 		this.webSocket.onmessage = (message: MessageEvent) => {
-			console.log('Message received:', message.data);
-			
-			try {
-				const data = JSON.parse(message.data);
-				if (data.memberID) {
-					const myID: string = data.memberID;
-					sessionStorage.setItem("myID", myID);
-					console.log('Member ID set:', myID);
+			const data = JSON.parse(message.data)
+			if (sessionStorage.getItem("myID") == null) {
+				const myID: string = data.memberID
+				sessionStorage.setItem("myID", myID)
+			} else {
+				const findWithSameID = this.stableMembers.find(item => item?.ID == data?.ID)
+				if (findWithSameID) {
+					findWithSameID.video = data.video
+				} else {
+					this.stableMembers.push(data)
 				}
-			} catch (error) {
-				console.error('Error parsing message:', error);
 			}
-		};
+		}
 	
 		this.webSocket.onclose = () => {
-			console.log('WebSocket connection closed');
-		};
+			console.log('WebSocket connection closed')
+		}
 	
 		this.webSocket.onerror = (error) => {
-			console.error('WebSocket error:', error);
-		};
+			console.error('WebSocket error:', error)
+		}
 	}	
 
 	sendMessage(name: string, ID: string, video: string) {
@@ -69,14 +94,14 @@ constructor(private http: HttpClient) { }
 				"name":`${name}`,
 				"ID":`${ID}`,
 				"video":`${video}`
-			}));
+			}))
 		} else {
-			console.error('WebSocket is not open. Unable to send message.');
+			console.error('WebSocket is not open. Unable to send message.')
 		}
 	}
 
 	close() {
-		if(this.webSocket && this.webSocket.readyState !== WebSocket.CLOSED) {
+		if(this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
 			this.webSocket.close()
 		} else {
 			console.error('WebSocket already closed.')

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { SessionService } from '../session.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,7 +8,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './list.component.css'
 })
 export class ListComponent {
-	constructor(public sessionService: SessionService) {}
+	constructor() {}
 
 	async kickMember(memberID: string) {
 		// await this.sessionService.leaveMeeting(memberID)
