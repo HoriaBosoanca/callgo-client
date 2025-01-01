@@ -7,10 +7,8 @@ The live app is [here](https://callgo-client.vercel.app/menu).
 
 ## Todo
 ### Soon
-Implement redirect to menu when the websocket closes \ 
-Reimplement list component and kicking \
 Learn about sync.mutex and use it on the server (to safely write to ws connections and maps) \
-Make a member and meeting cleanup system on the server \
+Make a member and meeting cleanup system on the server + stableMembers cleanup on client \
 Use more goroutines on the server \
 Move client to rpi and link it to domain 
 ### Later
@@ -31,3 +29,5 @@ Implement leave / kick feature \
 Rewrite server with websockets \
 Rewire client to new server \
 Reimplement meeting rejoin after refreshing tab \
+Implement redirect to menu when the websocket closes \ 
+Reimplement list component and kicking \

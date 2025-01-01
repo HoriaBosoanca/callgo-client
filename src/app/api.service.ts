@@ -54,12 +54,13 @@ export class ApiService {
 		this.webSocket = new WebSocket(`${this.webSocketUrl}?sessionID=${sessionID}`)
 	
 		this.webSocket.onopen = (event: Event) => {
+			// console.log(this.stableMembers)
 			console.log('WebSocket connection established')
 		}
 	
 		this.webSocket.onmessage = (message: MessageEvent) => {
 			const data = JSON.parse(message.data)
-			if (sessionStorage.getItem("myID") == null) {
+			if (data.memberID != null) {
 				const myID: string = data.memberID
 				sessionStorage.setItem("myID", myID)
 			} else {
@@ -74,6 +75,8 @@ export class ApiService {
 	
 		this.webSocket.onclose = () => {
 			console.log('WebSocket connection closed')
+			this.stableMembers = []
+			this.router.navigate(['/menu'])
 		}
 	
 		this.webSocket.onerror = (error) => {

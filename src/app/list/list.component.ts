@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ApiService } from '../api.service';
 
 @Component({
   selector: 'app-list',
@@ -8,9 +9,16 @@ import { CommonModule } from '@angular/common';
   styleUrl: './list.component.css'
 })
 export class ListComponent {
-	constructor() {}
+
+	constructor(public apiService: ApiService) {}
+
+	meetingCode = sessionStorage.getItem("sessionID")
 
 	async kickMember(memberID: string) {
-		// await this.sessionService.leaveMeeting(memberID)
+		if(sessionStorage.getItem("password")) {
+			await this.apiService.kickSession(sessionStorage.getItem("sessionID")!, memberID, sessionStorage.getItem("password")!)
+		} else {
+			console.error("You are not the meeting host.")
+		}
 	}
 }
