@@ -21,14 +21,20 @@ export class MenuComponent implements OnInit {
 	meetingID: string = ""
 	
 	// HTML refs
-	@ViewChild('nameInputCreate') nameInputCreate!: ElementRef;
-	@ViewChild('nameInputJoin') nameInputJoin!: ElementRef;
-	@ViewChild('joinInput') joinInput!: ElementRef;
+	@ViewChild('nameInputCreate')
+	nameInputCreate!: ElementRef;
+	
+	@ViewChild('nameInputJoin') 
+	nameInputJoin!: ElementRef;
+	
+	@ViewChild('joinInput') 
+	joinInput!: ElementRef;
 
 	async startMeeting() {
 		if(this.displayNameCreate != "") {
 			await this.apiService.startMeeting()
-			this.apiService.joinMeeting(sessionStorage.getItem("sessionID")!, this.displayNameCreate)
+			sessionStorage.setItem("myName", this.displayNameCreate)
+			this.router.navigate(['/video'])
 		} else {
 			this.nameInputCreate.nativeElement.style.borderColor = 'red'
 			console.log("Empty name")
@@ -37,7 +43,9 @@ export class MenuComponent implements OnInit {
 	
 	joinMeeting() {
 		if(this.displayNameJoin != "" && this.meetingID != "") {
-			this.apiService.joinMeeting(this.meetingID, this.displayNameJoin)
+			sessionStorage.setItem('sessionID', this.meetingID)
+			sessionStorage.setItem("myName", this.displayNameJoin)
+			this.router.navigate(['/video'])
 		} else {
 			this.nameInputJoin.nativeElement.style.borderColor = 'red'
 			this.joinInput.nativeElement.style.borderColor = 'red'

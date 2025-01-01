@@ -28,13 +28,6 @@ export class ApiService {
 		sessionStorage.setItem('password', password)
 	}
 	
-	joinMeeting(sessionID: string, displayName: string) {
-		this.connect(sessionID)
-		sessionStorage.setItem('sessionID', sessionID)
-		sessionStorage.setItem("myName", displayName)
-		this.router.navigate(['/video'])
-	}
-
 	// private apiUrl = 'https://callgo-server-386137910114.europe-west3.run.app'
 	// private apiUrl = 'https://horia.live:8443'
 	private httpUrl = 'http://localhost:1234'

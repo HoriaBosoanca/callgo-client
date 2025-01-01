@@ -7,10 +7,14 @@ The live app is [here](https://callgo-client.vercel.app/menu).
 
 ## Todo
 ### Soon
-Rewire client to new server \
+Implement redirect to menu when the websocket closes \ 
+Reimplement list component and kicking \
+Learn about sync.mutex and use it on the server (to safely write to ws connections and maps) \
+Make a member and meeting cleanup system on the server \
+Use more goroutines on the server \
 Move client to rpi and link it to domain 
 ### Later
-Implement join request feature, optimize backend with goroutines \
+Implement join request feature \
 Use WebRTC \
 Microphone support \
 Share screen support
@@ -23,5 +27,7 @@ Fix a bug where 'ngFor' reloads the entire image element instead of only it's so
 Display every member's video on a decent UI, with display names as overlays and make a component with a list of IDs for debugging \
 Use session storage so the app can be refreshed without leaving the meeting \
 Moved API from Google Cloud to Raspberry PI \
-Implement leave / kick feature 
+Implement leave / kick feature \ 
 Rewrite server with websockets \
+Rewire client to new server \
+Reimplement meeting rejoin after refreshing tab \

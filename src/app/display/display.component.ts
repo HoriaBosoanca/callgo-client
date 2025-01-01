@@ -12,7 +12,8 @@ import { ApiService } from '../api.service'
 export class DisplayComponent implements OnInit {
 	constructor(private apiService: ApiService) {}
 
-	@ViewChild('videoBox') videoBox!: ElementRef
+	@ViewChild('videoBox') 
+	videoBox!: ElementRef
 
 	private oldAmountOfMembers = 0
 	
@@ -47,7 +48,7 @@ export class DisplayComponent implements OnInit {
 				name.innerHTML = videoDataTransfer.name || 'Unknown';
 			}
 		}, this.apiService.delay);
-	}	
+	}
 	
 	correctImagesGenerated: boolean = false
 	images: HTMLImageElement[] = []
