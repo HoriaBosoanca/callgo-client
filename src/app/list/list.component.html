@@ -2,5 +2,5 @@
     <p class="text-special"> • meeting code: {{ meetingCode }} </p>
 </div>
 <div class="list-item" *ngFor="let member of apiService.stableMembers">
-    <p class="text"> | name: {{ member.name }} | ID: {{ member.ID }} | <button class="kick-button" (click)="kickMember(member.ID)">kick</button> </p>
+    <p class="text"> name: {{ member.name }} | ID: {{ member.ID }} | <button class="kick-button" (click)="kickMember(member.ID)">kick</button> </p>
 </div>
