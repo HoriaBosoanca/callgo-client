@@ -6,9 +6,9 @@ The repo for the server is [here](https://github.com/HoriaBosoanca/callgo-server
 The live app is [here](https://callgo-client.vercel.app/menu).
 
 ## Todo
+Learn about sync.mutex and use it on the server (to safely write to ws connections and maps) \
 Remove inactive cached members on client \
 Move client to rpi and link it to domain \
-Learn about sync.mutex and use it on the server (to safely write to ws connections and maps) \
 Make a member and meeting cleanup system on the server \
 Use more goroutines on the server \
 Use WebRTC \
