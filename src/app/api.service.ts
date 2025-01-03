@@ -29,8 +29,8 @@ export class ApiService {
 	}
 	
 	// 'https://callgo-server-386137910114.europe-west3.run.app'
-	private httpUrl = 'http://horia.live:8443'
-	private webSocketUrl = 'ws://horia.live:8443/ws'
+	private httpUrl = 'https://horia.live:8443'
+	private webSocketUrl = 'wss://horia.live:8443/ws'
 
 	// http
 	createSession(): Promise<any> {
