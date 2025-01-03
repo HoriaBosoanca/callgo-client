@@ -37,8 +37,8 @@ export class DisplayComponent implements OnInit {
 				const name = this.names[i];
 
 				img.src = videoDataTransfer.video;
-				if (img.src == 'data:,' || img.src == '../../assets/images/black.png') {
-					img.src = '../../assets/images/black.png'
+				if (img.src == 'data:,' || img.src == 'assets/images/black.png') {
+					img.src = 'assets/images/black.png'
 					name.style.top = '50%'
 					name.style.fontWeight = 'bold'
 				} else {
