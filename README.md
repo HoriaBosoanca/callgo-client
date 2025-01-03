@@ -6,15 +6,13 @@ The repo for the server is [here](https://github.com/HoriaBosoanca/callgo-server
 The live app is [here](https://callgo-client.vercel.app/menu).
 
 ## Todo
-Learn about sync.mutex and use it on the server (to safely write to ws connections and maps) \
-Remove inactive cached members on client \
 Move client to rpi and link it to domain \
-Make a member and meeting cleanup system on the server \
-Use more goroutines on the server \
-Use WebRTC \
 Microphone support \
+Use more goroutines on the server \
+Make a session cleanup system on the server (session timeouts) \
+Use WebRTC \
 Share screen support \
-Implement join request feature \
+Implement join request feature
 
 ## Done
 Send and receive video data via http \
@@ -30,3 +28,5 @@ Rewire client to new server \
 Reimplement meeting rejoin after refreshing tab \
 Implement redirect to menu when the websocket closes \ 
 Reimplement list component and kicking \
+Learn about sync.mutex and use it on the server (to safely write to ws connections and maps) \
+Live member join and disconnect ws notifications

@@ -39,7 +39,11 @@ export class ApiService {
 	}
 
 	kickSession(sessionID: string, memberID: string, password: string): Promise<any> {
-		return lastValueFrom(this.http.post(`${this.httpUrl}/disconnect`, {"sessionID":`${sessionID}`,"memberID":`${memberID}`,"password":`${password}`}, { headers: this.getHeaders() }))
+		return lastValueFrom(this.http.post(`${this.httpUrl}/disconnect`, {
+			"sessionID":`${sessionID}`,
+			"memberID":`${memberID}`,
+			"password":`${password}`
+		}, { headers: this.getHeaders() }))
 	}
 
 	// websocket
@@ -48,10 +52,10 @@ export class ApiService {
 	// members cache
 	public stableMembers: any[] = []
 	
-	connect(sessionID: string) {
+	connect(sessionID: string, displayName: string) {
 		console.log(sessionID)
 
-		this.webSocket = new WebSocket(`${this.webSocketUrl}?sessionID=${sessionID}`)
+		this.webSocket = new WebSocket(`${this.webSocketUrl}?sessionID=${sessionID}&displayName=${displayName}`)
 	
 		this.webSocket.onopen = (event: Event) => {
 			// console.log(this.stableMembers)
@@ -60,15 +64,34 @@ export class ApiService {
 	
 		this.webSocket.onmessage = (message: MessageEvent) => {
 			const data = JSON.parse(message.data)
-			if (data.memberID != null) {
-				const myID: string = data.memberID
-				sessionStorage.setItem("myID", myID)
-			} else {
-				const findWithSameID = this.stableMembers.find(item => item?.ID == data?.ID)
+			
+			// on member join (self) notification
+			if(data.myID != null) {
+				sessionStorage.setItem("myID", data.myID)
+			} 
+
+			// on member join (broadcast) notification
+			if(data.InitID != null) {
+				const findWithSameID = this.stableMembers.find(item => item?.memberID == data?.InitID)
+				// if member not already in meeting, push it's data
+				if(!findWithSameID) {
+					this.stableMembers.push({
+						"name": data.InitName,
+						"memberID": data.InitID
+					})
+				}
+			}
+
+			// on member disconnect notification
+			if(data.disconnectID != null) {
+				this.stableMembers = this.stableMembers.filter(item => item.memberID != data.disconnectID)
+			}
+
+			// on video data sent
+			if(data.video != null) {
+				const findWithSameID = this.stableMembers.find(item => item?.memberID == data?.memberID)
 				if (findWithSameID) {
 					findWithSameID.video = data.video
-				} else {
-					this.stableMembers.push(data)
 				}
 			}
 		}
