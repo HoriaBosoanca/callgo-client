@@ -18,19 +18,10 @@ export class CameraComponent implements OnInit {
 	async ngOnInit() {
 		this.apiService.connect(sessionStorage.getItem("sessionID")!, sessionStorage.getItem("myName")!)
 
-		let counter: number = 0
-
 		const timer = setInterval(async () => {
 			// stop if someone leaves meeting
 			if(!window.location.href.includes('video')) {
 				clearInterval(timer)
-			}
-
-			if(counter < 3) {
-				counter++
-				if(counter == 3) {
-					window.location.reload()
-				}
 			}
 
 			await this.send();
