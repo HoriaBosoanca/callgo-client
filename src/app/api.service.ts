@@ -28,10 +28,9 @@ export class ApiService {
 		sessionStorage.setItem('password', password)
 	}
 	
-	// private apiUrl = 'https://callgo-server-386137910114.europe-west3.run.app'
-	// private apiUrl = 'https://horia.live:8443'
-	private httpUrl = 'http://localhost:1234'
-	private webSocketUrl = 'ws://localhost:1234/ws'
+	// 'https://callgo-server-386137910114.europe-west3.run.app'
+	private httpUrl = 'http://localhost:4321'
+	private webSocketUrl = 'ws://localhost:4321/ws'
 
 	// http
 	createSession(): Promise<any> {
