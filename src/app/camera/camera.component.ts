@@ -18,10 +18,10 @@ export class CameraComponent implements OnInit {
 	async ngOnInit() {
 		this.apiService.connect(sessionStorage.getItem("sessionID")!, sessionStorage.getItem("myName")!)
 
-		if(sessionStorage.getItem("hasRefreshed") == null) {
-			window.location.reload()
-			sessionStorage.setItem("hasRefreshed", "true")
-		}
+		// if(sessionStorage.getItem("hasRefreshed") == null) {
+		// 	window.location.reload()
+		// 	sessionStorage.setItem("hasRefreshed", "true")
+		// }
 
 		const timer = setInterval(async () => {
 			// stop if someone leaves meeting
