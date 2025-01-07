@@ -3,14 +3,14 @@ This is the client for a video call app that I made as a personal project (with 
 
 ## Links
 The repo for the server is [here](https://github.com/HoriaBosoanca/callgo-server-ws). \
-The live app is [here](https://callgo-client.vercel.app/menu).
+The live app is [here](callgo.horia.live).
 
 ## Todo
-Move client to rpi and link it to domain \
+Use WebRTC \
 Microphone support \
+If sent video data is still too slow, learn how to use web workers \
 Use more goroutines on the server \
 Make a session cleanup system on the server (session timeouts) \
-Use WebRTC \
 Share screen support \
 Implement join request feature
 
@@ -24,9 +24,11 @@ Use session storage so the app can be refreshed without leaving the meeting \
 Moved API from Google Cloud to Raspberry PI \
 Implement leave / kick feature \ 
 Rewrite server with websockets \
+Figure out I should've sticked to Google Cloud and move back \
 Rewire client to new server \
 Reimplement meeting rejoin after refreshing tab \
 Implement redirect to menu when the websocket closes \ 
 Reimplement list component and kicking \
 Learn about sync.mutex and use it on the server (to safely write to ws connections and maps) \
-Live member join and disconnect ws notifications
+Live member join and disconnect ws notifications \
+Link client to domain (callgo.horia.live)

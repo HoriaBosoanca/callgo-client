@@ -30,6 +30,8 @@ export class ApiService {
 
 	private httpUrl = 'https://callgo-server-386137910114.europe-west1.run.app'
 	private webSocketUrl = 'wss://callgo-server-386137910114.europe-west1.run.app/ws'
+	// private httpUrl = 'http://localhost:8080'
+	// private webSocketUrl = 'http://localhost:8080/ws'
 
 	// http
 	createSession(): Promise<any> {
@@ -71,6 +73,7 @@ export class ApiService {
 			// on member join (broadcast) notification
 			if(data.InitID != null) {
 				const findWithSameID = this.stableMembers.find(item => item?.memberID == data?.InitID)
+				
 				// if member not already in meeting, push it's data
 				if(!findWithSameID) {
 					this.stableMembers.push({
