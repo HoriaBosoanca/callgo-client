@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { Injectable, OnInit } from '@angular/core'
 import { lastValueFrom, Observable } from 'rxjs'
 import { Router } from '@angular/router';
 
@@ -80,6 +80,7 @@ export class ApiService {
 						"name": data.InitName,
 						"memberID": data.InitID
 					})
+					this.makeRTC(data.InitID)
 				}
 			}
 
@@ -126,5 +127,83 @@ export class ApiService {
 		} else {
 			console.error('WebSocket already closed.')
 		}
+	}
+
+	// RTC
+	makeRTC(targetClientId: any) {
+		// sender
+		const peerConnection = new RTCPeerConnection({
+			iceServers: [
+				{ urls: 'stun:stun.l.google.com:19302' } // Public STUN server
+			]
+		});
+		
+		// Handle ICE candidates
+		peerConnection.onicecandidate = (event) => {
+			if (event.candidate) {
+				this.webSocket.send(JSON.stringify({
+					type: 'candidate',
+					candidate: event.candidate,
+					to: targetClientId
+				}));
+			}
+		};
+		
+		// Handle connection state changes
+		peerConnection.onconnectionstatechange = () => {
+			console.log("Connection state:", peerConnection.connectionState);
+		};
+
+		const dataChannel = peerConnection.createDataChannel("chat");
+
+		dataChannel.onopen = () => {
+			console.log("Data channel is open!");
+			dataChannel.send("Hello from the caller!");
+		};
+
+		dataChannel.onmessage = (event) => {
+			console.log("Received:", event.data);
+		};
+
+		peerConnection.createOffer().then((offer) => {
+			return peerConnection.setLocalDescription(offer);
+		}).then(() => {
+			this.webSocket.send(JSON.stringify({
+				type: 'offer',
+				sdp: peerConnection.localDescription,
+				to: targetClientId
+			}));
+		});
+		
+			
+		// receiver
+		// Handle ICE candidates
+		peerConnection.onicecandidate = (event) => {
+			if (event.candidate) {
+				this.webSocket.send(JSON.stringify({
+					type: 'candidate',
+					candidate: event.candidate,
+					to: targetClientId
+				}));
+			}
+		};
+		
+		// Handle connection state changes
+		peerConnection.onconnectionstatechange = () => {
+			console.log("Connection state:", peerConnection.connectionState);
+		};
+
+		peerConnection.ondatachannel = (event) => {
+			const dataChannel = event.channel;
+		
+			dataChannel.onopen = () => {
+				console.log("Data channel is open!");
+			};
+		
+			dataChannel.onmessage = (event) => {
+				console.log("Received:", event.data);
+			};
+		};
+		
 	}
 }
