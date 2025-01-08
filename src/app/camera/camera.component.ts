@@ -16,16 +16,16 @@ export class CameraComponent implements OnInit {
 	constructor(private apiService: ApiService) {}
 
 	async ngOnInit() {
-		this.apiService.connect(sessionStorage.getItem("sessionID")!, sessionStorage.getItem("myName")!)
+		await this.apiService.connect(sessionStorage.getItem("sessionID")!, sessionStorage.getItem("myName")!)
 
-		const timer = setInterval(async () => {
-			// stop if someone leaves meeting
-			if(!window.location.href.includes('video')) {
-				clearInterval(timer)
-			}
+		// const timer = setInterval(async () => {
+		// 	// stop if someone leaves meeting
+		// 	if(!window.location.href.includes('video')) {
+		// 		clearInterval(timer)
+		// 	}
 
-			await this.send();
-		}, this.apiService.delay)
+		// 	await this.send();
+		// }, this.apiService.delay)
 	}
 
 	videoElement: HTMLVideoElement = document.createElement('video')
@@ -53,14 +53,14 @@ export class CameraComponent implements OnInit {
 	}
 	
 	// Start capturing and sending video data
-	async send(): Promise<void> {
-		try {
-			const frame = this.createVideoFrame()
-			this.apiService.sendMessage(sessionStorage.getItem("myName")!, sessionStorage.getItem("myID")!, frame)
-		} catch (error) {
-			console.error('Error uploading video chunk:', error);
-		}
-	}
+	// async send(): Promise<void> {
+	// 	try {
+	// 		const frame = this.createVideoFrame()
+	// 		this.apiService.sendMessage(sessionStorage.getItem("myName")!, sessionStorage.getItem("myID")!, frame)
+	// 	} catch (error) {
+	// 		console.error('Error uploading video chunk:', error);
+	// 	}
+	// }
 
 	// Capture frame as Base64
 	canvas: HTMLCanvasElement = document.createElement('canvas');

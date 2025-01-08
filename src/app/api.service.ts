@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable, OnInit } from '@angular/core'
-import { lastValueFrom, Observable } from 'rxjs'
+import { from, lastValueFrom, Observable } from 'rxjs'
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -28,10 +28,10 @@ export class ApiService {
 		sessionStorage.setItem('password', password)
 	}
 
-	private httpUrl = 'https://callgo-server-386137910114.europe-west1.run.app'
-	private webSocketUrl = 'wss://callgo-server-386137910114.europe-west1.run.app/ws'
-	// private httpUrl = 'http://localhost:8080'
-	// private webSocketUrl = 'http://localhost:8080/ws'
+	// private httpUrl = 'https://callgo-server-386137910114.europe-west1.run.app'
+	// private webSocketUrl = 'wss://callgo-server-386137910114.europe-west1.run.app/ws'
+	private httpUrl = 'http://localhost:8080'
+	private webSocketUrl = 'http://localhost:8080/ws'
 
 	// http
 	createSession(): Promise<any> {
@@ -51,51 +51,91 @@ export class ApiService {
 
 	// members cache
 	public stableMembers: any[] = []
-	
-	connect(sessionID: string, displayName: string) {
+
+	async connect(sessionID: string, displayName: string) {
 		console.log(sessionID)
 
 		this.webSocket = new WebSocket(`${this.webSocketUrl}?sessionID=${sessionID}&displayName=${displayName}`)
 	
 		this.webSocket.onopen = (event: Event) => {
-			// console.log(this.stableMembers)
 			console.log('WebSocket connection established')
 		}
 	
-		this.webSocket.onmessage = (message: MessageEvent) => {
+		this.webSocket.onmessage = async (message: MessageEvent) => {
 			const data = JSON.parse(message.data)
 			
-			// on member join (self) notification
-			if(data.myID != null) {
-				sessionStorage.setItem("myID", data.myID)
+			// when being asigned an ID
+			if(data.type == "assignID") {
+				sessionStorage.setItem("myID", data.memberID)
+				this.stableMembers.push({
+					"name": data.memberName,
+					"memberID": data.memberID
+				})
 			} 
 
-			// on member join (broadcast) notification
-			if(data.InitID != null) {
-				const findWithSameID = this.stableMembers.find(item => item?.memberID == data?.InitID)
-				
-				// if member not already in meeting, push it's data
-				if(!findWithSameID) {
-					this.stableMembers.push({
-						"name": data.InitName,
-						"memberID": data.InitID
-					})
-					this.makeRTC(data.InitID)
+			// when being notified about who is already in the meeting (on meeting join)
+			if(data.type == "exist") {
+				this.stableMembers.push({
+					"name": data.memberName,
+					"memberID": data.memberID
+				})
+			}
+
+			// when being notified about a new joining member
+			if(data.type == "join") {
+				// send SDP for webRTC
+				const peerConnection = new RTCPeerConnection()
+				try {
+					await peerConnection.setLocalDescription(await peerConnection.createOffer())
+					this.sendSDP(peerConnection.localDescription!, data.memberID, sessionStorage.getItem("myID")!)
+				} catch(error) {
+					console.log(error)
 				}
+
+				this.stableMembers.push({
+					"name": data.memberName,
+					"memberID": data.memberID,
+					"conn": peerConnection
+				})
 			}
 
 			// on member disconnect notification
-			if(data.disconnectID != null) {
-				this.stableMembers = this.stableMembers.filter(item => item.memberID != data.disconnectID)
+			if(data.type == "leave") {
+				this.stableMembers = this.stableMembers.filter(member => member.memberID != data.memberID)
+			}
+
+			// on received SDP
+			if(data.sdp) {
+				if(data.sdp.type == "offer") {
+					const peerConnection = new RTCPeerConnection()
+					try {
+						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
+						findWithSameID.conn = peerConnection
+						peerConnection.setRemoteDescription(data.sdp)
+						await peerConnection.setLocalDescription(await peerConnection.createAnswer())
+					} catch(error) {
+						console.log(error)
+					}
+					this.sendSDP(peerConnection.localDescription!, data.from, sessionStorage.getItem("myID")!)
+				}
+	
+				if(data.sdp.type == "answer") {
+					try {
+						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
+						findWithSameID.conn.setRemoteDescription(data.sdp)
+					} catch(error) {
+						console.log(error)
+					}
+				}
 			}
 
 			// on video data sent
-			if(data.video != null) {
-				const findWithSameID = this.stableMembers.find(item => item?.memberID == data?.memberID)
-				if (findWithSameID) {
-					findWithSameID.video = data.video
-				}
-			}
+			// if(data.video != null) {
+			// 	const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.memberID)
+			// 	if (findWithSameID) {
+			// 		findWithSameID.video = data.video
+			// 	}
+			// }
 		}
 	
 		this.webSocket.onclose = () => {
@@ -109,17 +149,17 @@ export class ApiService {
 		}
 	}	
 
-	sendMessage(name: string, ID: string, video: string) {
-		if (this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
-			this.webSocket.send(JSON.stringify({
-				"name":`${name}`,
-				"ID":`${ID}`,
-				"video":`${video}`
-			}))
-		} else {
-			console.error('WebSocket is not open. Unable to send message.')
-		}
-	}
+	// sendMessage(name: string, ID: string, video: string) {
+	// 	if (this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
+	// 		this.webSocket.send(JSON.stringify({
+	// 			"name":`${name}`,
+	// 			"ID":`${ID}`,
+	// 			"video":`${video}`
+	// 		}))
+	// 	} else {
+	// 		console.error('WebSocket is not open. Unable to send message.')
+	// 	}
+	// }
 
 	close() {
 		if(this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
@@ -129,81 +169,11 @@ export class ApiService {
 		}
 	}
 
-	// RTC
-	makeRTC(targetClientId: any) {
-		// sender
-		const peerConnection = new RTCPeerConnection({
-			iceServers: [
-				{ urls: 'stun:stun.l.google.com:19302' } // Public STUN server
-			]
-		});
-		
-		// Handle ICE candidates
-		peerConnection.onicecandidate = (event) => {
-			if (event.candidate) {
-				this.webSocket.send(JSON.stringify({
-					type: 'candidate',
-					candidate: event.candidate,
-					to: targetClientId
-				}));
-			}
-		};
-		
-		// Handle connection state changes
-		peerConnection.onconnectionstatechange = () => {
-			console.log("Connection state:", peerConnection.connectionState);
-		};
-
-		const dataChannel = peerConnection.createDataChannel("chat");
-
-		dataChannel.onopen = () => {
-			console.log("Data channel is open!");
-			dataChannel.send("Hello from the caller!");
-		};
-
-		dataChannel.onmessage = (event) => {
-			console.log("Received:", event.data);
-		};
-
-		peerConnection.createOffer().then((offer) => {
-			return peerConnection.setLocalDescription(offer);
-		}).then(() => {
-			this.webSocket.send(JSON.stringify({
-				type: 'offer',
-				sdp: peerConnection.localDescription,
-				to: targetClientId
-			}));
-		});
-		
-			
-		// receiver
-		// Handle ICE candidates
-		peerConnection.onicecandidate = (event) => {
-			if (event.candidate) {
-				this.webSocket.send(JSON.stringify({
-					type: 'candidate',
-					candidate: event.candidate,
-					to: targetClientId
-				}));
-			}
-		};
-		
-		// Handle connection state changes
-		peerConnection.onconnectionstatechange = () => {
-			console.log("Connection state:", peerConnection.connectionState);
-		};
-
-		peerConnection.ondatachannel = (event) => {
-			const dataChannel = event.channel;
-		
-			dataChannel.onopen = () => {
-				console.log("Data channel is open!");
-			};
-		
-			dataChannel.onmessage = (event) => {
-				console.log("Received:", event.data);
-			};
-		};
-		
+	sendSDP(sdp: RTCSessionDescription, to: string, from: string) {
+		this.webSocket.send(JSON.stringify({
+			"to": to,
+			"from": from,
+			"sdp": sdp
+		}))
 	}
 }
