@@ -18,14 +18,23 @@ export class CameraComponent implements OnInit {
 	async ngOnInit() {
 		await this.apiService.connect(sessionStorage.getItem("sessionID")!, sessionStorage.getItem("myName")!)
 
-		// const timer = setInterval(async () => {
-		// 	// stop if someone leaves meeting
-		// 	if(!window.location.href.includes('video')) {
-		// 		clearInterval(timer)
-		// 	}
+		const timer = setInterval(async () => {
+			// stop if someone leaves meeting
+			if(!window.location.href.includes('video')) {
+				clearInterval(timer)
+			}
 
-		// 	await this.send();
-		// }, this.apiService.delay)
+			for(let member of this.apiService.stableMembers) {
+				try {
+					if(member.conn) {
+						await member.conn.addTrack((await navigator.mediaDevices.getUserMedia({ video: true, audio: false })).getTracks())
+					}
+				} catch(error) {
+					console.log(error)
+				}
+			}
+			
+		}, this.apiService.delay)
 	}
 
 	videoElement: HTMLVideoElement = document.createElement('video')

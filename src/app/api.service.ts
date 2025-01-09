@@ -102,7 +102,10 @@ export class ApiService {
 				} catch(error) {
 					console.log(error)
 				}
-
+				// on track
+				peerConnection.ontrack = (event) => {
+					console.log(event.streams[0])
+				}
 
 				this.stableMembers.push({
 					"name": data.memberName,
