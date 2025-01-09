@@ -52,6 +52,9 @@ export class ApiService {
 	// members cache
 	public stableMembers: any[] = []
 
+	// stun server
+	private config = {iceServers: [{ 'urls': 'stun:stun.l.google.com:19302' }]}
+
 	async connect(sessionID: string, displayName: string) {
 		console.log(sessionID)
 
@@ -83,14 +86,23 @@ export class ApiService {
 
 			// when being notified about a new joining member
 			if(data.type == "join") {
-				// send SDP for webRTC
-				const peerConnection = new RTCPeerConnection()
+				// webRTC
+				const peerConnection = new RTCPeerConnection(this.config)
+				// send ICE
+				peerConnection.addEventListener('icecandidate', event => {
+					console.log(event.candidate)
+					if (event.candidate) {
+						console.log(event.candidate)
+					}
+				})
+				// send SDP
 				try {
 					await peerConnection.setLocalDescription(await peerConnection.createOffer())
 					this.sendSDP(peerConnection.localDescription!, data.memberID, sessionStorage.getItem("myID")!)
 				} catch(error) {
 					console.log(error)
 				}
+
 
 				this.stableMembers.push({
 					"name": data.memberName,
@@ -107,11 +119,11 @@ export class ApiService {
 			// on received SDP
 			if(data.sdp) {
 				if(data.sdp.type == "offer") {
-					const peerConnection = new RTCPeerConnection()
+					const peerConnection = new RTCPeerConnection(this.config)
 					try {
 						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
 						findWithSameID.conn = peerConnection
-						peerConnection.setRemoteDescription(data.sdp)
+						peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp))
 						await peerConnection.setLocalDescription(await peerConnection.createAnswer())
 					} catch(error) {
 						console.log(error)
@@ -122,7 +134,7 @@ export class ApiService {
 				if(data.sdp.type == "answer") {
 					try {
 						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
-						findWithSameID.conn.setRemoteDescription(data.sdp)
+						findWithSameID.conn.setRemoteDescription(new RTCSessionDescription(data.sdp))
 					} catch(error) {
 						console.log(error)
 					}
