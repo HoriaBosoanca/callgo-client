@@ -27,7 +27,7 @@ export class CameraComponent implements OnInit {
 			for(let member of this.apiService.stableMembers) {
 				try {
 					if(member.conn) {
-						await member.conn.addTrack((await navigator.mediaDevices.getUserMedia({ video: true, audio: false })).getTracks())
+						member.conn.addTrack((await navigator.mediaDevices.getUserMedia({ video: true, audio: false })).getTracks()[0])
 					}
 				} catch(error) {
 					console.log(error)

@@ -36,7 +36,7 @@ export class DisplayComponent implements OnInit {
 				const img = this.images[i];
 				const name = this.names[i];
 
-				img.src = videoDataTransfer.video;
+				// img.src = videoDataTransfer.video;
 				if (img.src.length < 50 || img.src == 'assets/images/black.png') {
 					img.src = 'assets/images/black.png'
 					name.style.top = '50%'

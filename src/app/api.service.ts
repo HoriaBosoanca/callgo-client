@@ -3,6 +3,12 @@ import { Injectable, OnInit } from '@angular/core'
 import { from, lastValueFrom, Observable } from 'rxjs'
 import { Router } from '@angular/router';
 
+interface Member {
+	memberID: string
+	name: string
+	conn: RTCPeerConnection | null
+}
+
 @Injectable({
 providedIn: 'root'
 })
@@ -50,7 +56,7 @@ export class ApiService {
 	private webSocket!: WebSocket
 
 	// members cache
-	public stableMembers: any[] = []
+	public stableMembers: Member[] = []
 
 	// stun server
 	private config = {iceServers: [{ 'urls': 'stun:stun.l.google.com:19302' }]}
@@ -72,7 +78,8 @@ export class ApiService {
 				sessionStorage.setItem("myID", data.memberID)
 				this.stableMembers.push({
 					"name": data.memberName,
-					"memberID": data.memberID
+					"memberID": data.memberID,
+					"conn": null
 				})
 			} 
 
@@ -80,7 +87,8 @@ export class ApiService {
 			if(data.type == "exist") {
 				this.stableMembers.push({
 					"name": data.memberName,
-					"memberID": data.memberID
+					"memberID": data.memberID,
+					"conn": null
 				})
 			}
 
@@ -89,12 +97,12 @@ export class ApiService {
 				// webRTC
 				const peerConnection = new RTCPeerConnection(this.config)
 				// send ICE
-				peerConnection.addEventListener('icecandidate', event => {
+				peerConnection.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
 					console.log(event.candidate)
 					if (event.candidate) {
 						console.log(event.candidate)
 					}
-				})
+				}
 				// send SDP
 				try {
 					await peerConnection.setLocalDescription(await peerConnection.createOffer())
@@ -125,7 +133,7 @@ export class ApiService {
 					const peerConnection = new RTCPeerConnection(this.config)
 					try {
 						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
-						findWithSameID.conn = peerConnection
+						findWithSameID!.conn = peerConnection
 						peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp))
 						await peerConnection.setLocalDescription(await peerConnection.createAnswer())
 					} catch(error) {
@@ -137,7 +145,14 @@ export class ApiService {
 				if(data.sdp.type == "answer") {
 					try {
 						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
-						findWithSameID.conn.setRemoteDescription(new RTCSessionDescription(data.sdp))
+						findWithSameID!.conn!.setRemoteDescription(new RTCSessionDescription(data.sdp))
+
+						const usrMedia: MediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+						console.log(usrMedia)
+						for(let track of usrMedia.getTracks()) {
+							console.log(track)
+							findWithSameID!.conn!.addTrack(track)
+						}
 					} catch(error) {
 						console.log(error)
 					}
