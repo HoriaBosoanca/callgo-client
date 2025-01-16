@@ -19,9 +19,6 @@ export class ApiService {
 	// members data
 	public stableMembers: Member[] = []
 
-	// constant (for timers)
-	public DELAY: number = 25
-
 	// private httpUrl = 'https://callgo-server-386137910114.europe-west1.run.app'
 	// private webSocketUrl = 'wss://callgo-server-386137910114.europe-west1.run.app/ws'
 	private httpUrl = 'http://localhost:8080'
