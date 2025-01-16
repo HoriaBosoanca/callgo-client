@@ -19,7 +19,7 @@ export class DisplayComponent implements OnInit {
 	names: HTMLParagraphElement[] = []
 
 	ngOnInit(): void {
-		this.apiService.onNewPeer = (member) => {
+		this.apiService.initMemberDisplay = (member) => {
 			member.conn!.ontrack = (event) => {
 				const mediaStream = new MediaStream()
 				mediaStream.addTrack(event.track)

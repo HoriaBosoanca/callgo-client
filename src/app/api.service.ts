@@ -47,7 +47,8 @@ export class ApiService {
 	private config = {iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun2.1.google.com:19302'] }]}
 
 	// callbacks that other classes can define using their context, but apiService calls them
-	public onNewPeer = (newMember: Member) => {}
+	public initMemberDisplay = (newMember: Member) => {}
+	public initMemberCamera = (newMember: Member) => {}
 
 	async connect(sessionID: string, displayName: string) {
 		console.log(sessionID)
@@ -120,8 +121,9 @@ export class ApiService {
 						const answer: RTCSessionDescriptionInit = await peerConnection.createAnswer()
 						await peerConnection.setLocalDescription(answer)
 						this.sendSDP(answer, data.from, sessionStorage.getItem("myID")!)
-						
-						this.onNewPeer(findWithSameID!)
+
+						this.initMemberDisplay(findWithSameID!)
+						this.initMemberCamera(findWithSameID!)
 					} catch(error) {
 						console.log(error)
 					}
@@ -132,7 +134,8 @@ export class ApiService {
 						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
 						await findWithSameID!.conn!.setRemoteDescription(new RTCSessionDescription(data.sdp))
 
-						this.onNewPeer(findWithSameID!)
+						this.initMemberDisplay(findWithSameID!)
+						this.initMemberCamera(findWithSameID!)
 					} catch(error) {
 						console.log(error)
 					}

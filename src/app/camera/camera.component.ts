@@ -31,7 +31,7 @@ export class CameraComponent implements OnInit {
 				}
       		})
 
-		this.apiService.onNewPeer = (member) => {
+		this.apiService.initMemberCamera = (member) => {
 			if(member.conn && this.mediaStream) {
 				for(let track of this.mediaStream.getTracks()) {
 					member.conn.addTrack(track, this.mediaStream)
