@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { ApiService } from '../api.service';
 import { DisplayComponent } from '../display/display.component';
 import { ListComponent } from '../list/list.component';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-camera',
@@ -13,30 +15,29 @@ import { ListComponent } from '../list/list.component';
   styleUrls: ['./camera.component.css']
 })
 export class CameraComponent implements OnInit {
-	constructor(private apiService: ApiService) {}
+	constructor(private apiService: ApiService, private router: Router) {}
 
 	async ngOnInit() {
 		await this.apiService.connect(sessionStorage.getItem("sessionID")!, sessionStorage.getItem("myName")!)
 
-		const timer = setInterval(async () => {
-			// stop if someone leaves meeting
-			if(!window.location.href.includes('video')) {
-				clearInterval(timer)
-			}
-
-			for(let member of this.apiService.stableMembers) {
-				try {
-					if(member.conn) {
-						for(let track of (await navigator.mediaDevices.getUserMedia({ video: true, audio: false })).getTracks()) {
-							member.conn.addTrack(track)
-						}
+		this.router.events
+      		.pipe(filter(event => event instanceof NavigationEnd))
+      		.subscribe((event: NavigationEnd) => {
+				if (!event.urlAfterRedirects.includes('video')) {
+					this.turnOffCamera()
+					if(this.timer) {
+						window.clearInterval(this.timer)
 					}
-				} catch(error) {
-					console.log(error)
+				}
+      		})
+
+		this.apiService.onNewPeer = (member) => {
+			if(member.conn && this.mediaStream) {
+				for(let track of this.mediaStream.getTracks()) {
+					member.conn.addTrack(track, this.mediaStream)
 				}
 			}
-			
-		}, this.apiService.delay)
+		}
 	}
 
 	videoElement: HTMLVideoElement = document.createElement('video')
@@ -51,36 +52,22 @@ export class CameraComponent implements OnInit {
 			await this.turnOnCamera()
 		}
 	}
+
+	timer: number | undefined = undefined
 	
 	turnOffCamera() {
 		this.camIsOn = false;
 		this.videoElement.srcObject = null;
 	}
+
+	mediaStream: MediaStream| undefined = undefined
 	
 	async turnOnCamera() {
 		this.camIsOn = true;
-		this.videoElement.srcObject = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-		this.videoElement.play();
-	}
-	
-	// Start capturing and sending video data
-	// async send(): Promise<void> {
-	// 	try {
-	// 		const frame = this.createVideoFrame()
-	// 		this.apiService.sendMessage(sessionStorage.getItem("myName")!, sessionStorage.getItem("myID")!, frame)
-	// 	} catch (error) {
-	// 		console.error('Error uploading video chunk:', error);
-	// 	}
-	// }
-
-	// Capture frame as Base64
-	canvas: HTMLCanvasElement = document.createElement('canvas');
-	createVideoFrame(): string {
-		this.canvas.width = this.videoElement.videoWidth;
-		this.canvas.height = this.videoElement.videoHeight;
-		const context = this.canvas.getContext('2d');
-		context?.drawImage(this.videoElement, 0, 0, this.canvas.width, this.canvas.height)
-		return this.canvas.toDataURL('image/jpeg');
+		
+		const mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+		this.videoElement.srcObject = mediaStream
+		this.videoElement.play()
 	}
 
 	listIsDisplayed = false

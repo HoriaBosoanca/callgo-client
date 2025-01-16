@@ -16,23 +16,11 @@ export class ApiService {
 
 	constructor(private http: HttpClient, private router: Router) { }
 
-	private getHeaders(): HttpHeaders {
-		return new HttpHeaders({
-		'Content-Type': 'application/json'
-		})
-	}
+	// members data
+	public stableMembers: Member[] = []
 
-	// constants
-	public delay: number = 25
-
-	// === join / create ===
-	async startMeeting() {
-		const obj: any = await this.createSession()
-		const sessionID = obj.sessionID
-		const password = obj.password
-		sessionStorage.setItem('sessionID', sessionID)
-		sessionStorage.setItem('password', password)
-	}
+	// constant (for timers)
+	public DELAY: number = 25
 
 	// private httpUrl = 'https://callgo-server-386137910114.europe-west1.run.app'
 	// private webSocketUrl = 'wss://callgo-server-386137910114.europe-west1.run.app/ws'
@@ -41,7 +29,7 @@ export class ApiService {
 
 	// http
 	createSession(): Promise<any> {
-		return lastValueFrom(this.http.post(`${this.httpUrl}/initialize`, { headers: this.getHeaders() }))
+		return lastValueFrom(this.http.post(`${this.httpUrl}/initialize`, null))
 	}
 
 	kickSession(sessionID: string, memberID: string, password: string): Promise<any> {
@@ -49,17 +37,17 @@ export class ApiService {
 			"sessionID":`${sessionID}`,
 			"memberID":`${memberID}`,
 			"password":`${password}`
-		}, { headers: this.getHeaders() }))
+		}))
 	}
 
 	// websocket
 	private webSocket!: WebSocket
 
-	// members cache
-	public stableMembers: Member[] = []
-
 	// stun server
-	private config = {iceServers: [{ 'urls': 'stun:stun.l.google.com:19302' }]}
+	private config = {iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun2.1.google.com:19302'] }]}
+
+	// callbacks that other classes can define using their context, but apiService calls them
+	public onNewPeer = (newMember: Member) => {}
 
 	async connect(sessionID: string, displayName: string) {
 		console.log(sessionID)
@@ -98,10 +86,8 @@ export class ApiService {
 				const peerConnection = new RTCPeerConnection(this.config)
 				// send ICE
 				peerConnection.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-					console.log(event.candidate)
-					if (event.candidate) {
-						console.log(event.candidate)
-					}
+					console.log(event)
+					event.candidate && console.log(event.candidate)
 				}
 				// send SDP
 				try {
@@ -109,10 +95,6 @@ export class ApiService {
 					this.sendSDP(peerConnection.localDescription!, data.memberID, sessionStorage.getItem("myID")!)
 				} catch(error) {
 					console.log(error)
-				}
-				// on track
-				peerConnection.ontrack = (event) => {
-					console.log(event.streams[0])
 				}
 
 				this.stableMembers.push({
@@ -134,38 +116,28 @@ export class ApiService {
 					try {
 						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
 						findWithSameID!.conn = peerConnection
-						peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp))
-						await peerConnection.setLocalDescription(await peerConnection.createAnswer())
+						await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp))
+						const answer: RTCSessionDescriptionInit = await peerConnection.createAnswer()
+						await peerConnection.setLocalDescription(answer)
+						this.sendSDP(answer, data.from, sessionStorage.getItem("myID")!)
+						
+						this.onNewPeer(findWithSameID!)
 					} catch(error) {
 						console.log(error)
 					}
-					this.sendSDP(peerConnection.localDescription!, data.from, sessionStorage.getItem("myID")!)
 				}
 	
 				if(data.sdp.type == "answer") {
 					try {
 						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
-						findWithSameID!.conn!.setRemoteDescription(new RTCSessionDescription(data.sdp))
+						await findWithSameID!.conn!.setRemoteDescription(new RTCSessionDescription(data.sdp))
 
-						const usrMedia: MediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-						console.log(usrMedia)
-						for(let track of usrMedia.getTracks()) {
-							console.log(track)
-							findWithSameID!.conn!.addTrack(track)
-						}
+						this.onNewPeer(findWithSameID!)
 					} catch(error) {
 						console.log(error)
 					}
 				}
 			}
-
-			// on video data sent
-			// if(data.video != null) {
-			// 	const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.memberID)
-			// 	if (findWithSameID) {
-			// 		findWithSameID.video = data.video
-			// 	}
-			// }
 		}
 	
 		this.webSocket.onclose = () => {
@@ -179,18 +151,6 @@ export class ApiService {
 		}
 	}	
 
-	// sendMessage(name: string, ID: string, video: string) {
-	// 	if (this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
-	// 		this.webSocket.send(JSON.stringify({
-	// 			"name":`${name}`,
-	// 			"ID":`${ID}`,
-	// 			"video":`${video}`
-	// 		}))
-	// 	} else {
-	// 		console.error('WebSocket is not open. Unable to send message.')
-	// 	}
-	// }
-
 	close() {
 		if(this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
 			this.webSocket.close()
@@ -199,7 +159,7 @@ export class ApiService {
 		}
 	}
 
-	sendSDP(sdp: RTCSessionDescription, to: string, from: string) {
+	sendSDP(sdp: RTCSessionDescriptionInit, to: string, from: string) {
 		this.webSocket.send(JSON.stringify({
 			"to": to,
 			"from": from,

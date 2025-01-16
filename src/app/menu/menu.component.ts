@@ -32,7 +32,11 @@ export class MenuComponent implements OnInit {
 
 	async startMeeting() {
 		if(this.displayNameCreate != "") {
-			await this.apiService.startMeeting()
+			const obj: any = await this.apiService.createSession()
+			const sessionID = obj.sessionID
+			const password = obj.password
+			sessionStorage.setItem('sessionID', sessionID)
+			sessionStorage.setItem('password', password)
 			sessionStorage.setItem("myName", this.displayNameCreate)
 			this.router.navigate(['/video'])
 		} else {
