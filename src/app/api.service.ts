@@ -69,7 +69,7 @@ export class ApiService {
 				})
 			} 
 
-			// when being notified about who is already in the meeting (on meeting join)
+			// when being notified about who is already in the meeting (aka when you join)
 			if(data.type == "exist") {
 				this.stableMembers.push({
 					"name": data.memberName,
@@ -78,14 +78,17 @@ export class ApiService {
 				})
 			}
 
-			// when being notified about a new joining member
+			// when being notified about a new joining member (aka when others join)
 			if(data.type == "join") {
 				// webRTC
 				const peerConnection = new RTCPeerConnection(this.config)
 				// send ICE
-				peerConnection.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-					console.log(event)
-					event.candidate && console.log(event.candidate)
+				peerConnection.onicecandidate = ({candidate}) => {
+					if(candidate) {
+						console.log(candidate)
+					} else {
+						console.log(candidate)
+					}
 				}
 				// send SDP
 				try {
@@ -114,10 +117,17 @@ export class ApiService {
 					try {
 						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
 						findWithSameID!.conn = peerConnection
+						// send ICE
+						findWithSameID!.conn!.onicecandidate = ({candidate}) => {
+							if(candidate) {
+								console.log(candidate)
+							} else {
+								console.log(candidate)
+							}
+						}
 						await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp))
-						const answer: RTCSessionDescriptionInit = await peerConnection.createAnswer()
-						await peerConnection.setLocalDescription(answer)
-						this.sendSDP(answer, data.from, sessionStorage.getItem("myID")!)
+						await peerConnection.setLocalDescription(await peerConnection.createAnswer())
+						this.sendSDP(peerConnection.localDescription!, data.from, sessionStorage.getItem("myID")!)
 
 						this.initMemberDisplay(findWithSameID!)
 						this.initMemberCamera(findWithSameID!)
@@ -129,6 +139,14 @@ export class ApiService {
 				if(data.sdp.type == "answer") {
 					try {
 						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
+						// send ICE
+						findWithSameID!.conn!.onicecandidate = ({candidate}) => {
+							if(candidate) {
+								console.log(candidate)
+							} else {
+								console.log(candidate)
+							}
+						}
 						await findWithSameID!.conn!.setRemoteDescription(new RTCSessionDescription(data.sdp))
 
 						this.initMemberDisplay(findWithSameID!)
