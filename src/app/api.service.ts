@@ -7,6 +7,7 @@ interface Member {
 	memberID: string
 	name: string
 	conn: RTCPeerConnection | null
+	stream: MediaStream
 }
 
 @Injectable({
@@ -44,8 +45,30 @@ export class ApiService {
 	private config = {iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun2.1.google.com:19302'] }]}
 
 	// callbacks that other classes can define using their context, but apiService calls them
-	public initMemberDisplay = (newMember: Member) => {}
-	public initMemberCamera = (newMember: Member) => {}
+	public initMemberDisplay = (newMember: Member) => {
+		newMember.conn!.ontrack = (event) => {
+			newMember.stream.addTrack(event.track)
+			// const videoElement: HTMLVideoElement = document.createElement('video')
+			// videoElement.srcObject = mediaStream
+			// this.videos.push(videoElement)
+
+			// const pElement: HTMLParagraphElement = document.createElement('p')
+			// pElement.innerHTML = member.name
+			// this.names.push(pElement) 
+			
+			// this.videoBox.nativeElement.appendChild(videoElement)
+			// videoElement.play()
+		}
+	}
+	
+	public localMediaStream: MediaStream| undefined = undefined
+	public initMemberCamera = (newMember: Member) => {
+		if(newMember.conn && this.localMediaStream) {
+			for(let track of this.localMediaStream.getTracks()) {
+				newMember.conn.addTrack(track, this.localMediaStream)
+			}
+		}
+	}
 
 	async connect(sessionID: string, displayName: string) {
 		console.log(sessionID)
@@ -65,7 +88,8 @@ export class ApiService {
 				this.stableMembers.push({
 					"name": data.memberName,
 					"memberID": data.memberID,
-					"conn": null
+					"conn": null,
+					"stream": new MediaStream()
 				})
 			} 
 
@@ -74,7 +98,8 @@ export class ApiService {
 				this.stableMembers.push({
 					"name": data.memberName,
 					"memberID": data.memberID,
-					"conn": null
+					"conn": null,
+					"stream": new MediaStream()
 				})
 			}
 
@@ -82,6 +107,7 @@ export class ApiService {
 			if(data.type == "join") {
 				// webRTC
 				const peerConnection = new RTCPeerConnection(this.config)
+				const dataChannel = peerConnection.createDataChannel("chat");
 				// send ICE
 				peerConnection.onicecandidate = ({candidate}) => {
 					if(candidate) {
@@ -101,7 +127,8 @@ export class ApiService {
 				this.stableMembers.push({
 					"name": data.memberName,
 					"memberID": data.memberID,
-					"conn": peerConnection
+					"conn": peerConnection,
+					"stream": new MediaStream()
 				})
 			}
 

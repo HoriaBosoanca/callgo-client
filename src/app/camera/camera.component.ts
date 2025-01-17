@@ -30,14 +30,6 @@ export class CameraComponent implements OnInit {
 					}
 				}
       		})
-
-		this.apiService.initMemberCamera = (member) => {
-			if(member.conn && this.mediaStream) {
-				for(let track of this.mediaStream.getTracks()) {
-					member.conn.addTrack(track, this.mediaStream)
-				}
-			}
-		}
 	}
 
 	videoElement: HTMLVideoElement = document.createElement('video')
@@ -59,13 +51,12 @@ export class CameraComponent implements OnInit {
 		this.camIsOn = false;
 		this.videoElement.srcObject = null;
 	}
-
-	mediaStream: MediaStream| undefined = undefined
 	
 	async turnOnCamera() {
 		this.camIsOn = true;
 		
 		const mediaStream: MediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+		this.apiService.localMediaStream = mediaStream
 		this.videoElement.srcObject = mediaStream
 		this.videoElement.play()
 	}

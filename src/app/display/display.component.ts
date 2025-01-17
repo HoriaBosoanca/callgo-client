@@ -20,20 +20,7 @@ export class DisplayComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.apiService.initMemberDisplay = (member) => {
-			member.conn!.ontrack = (event) => {
-				const mediaStream = new MediaStream()
-				mediaStream.addTrack(event.track)
-				const videoElement: HTMLVideoElement = document.createElement('video')
-				videoElement.srcObject = mediaStream
-				this.videos.push(videoElement)
-
-				const pElement: HTMLParagraphElement = document.createElement('p')
-				pElement.innerHTML = member.name
-				this.names.push(pElement) 
-				
-				this.videoBox.nativeElement.appendChild(videoElement)
-				videoElement.play()
-			}
+			
 		}
 	}
 }
