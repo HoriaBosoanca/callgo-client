@@ -12,15 +12,6 @@ import { ApiService } from '../api.service'
 export class DisplayComponent implements OnInit {
 	constructor(public apiService: ApiService) {}
 
-	@ViewChild('videoBox') 
-	videoBox!: ElementRef
-	
-	videos: HTMLVideoElement[] = []
-	names: HTMLParagraphElement[] = []
-
 	ngOnInit(): void {
-		this.apiService.initMemberDisplay = (member) => {
-			
-		}
 	}
 }

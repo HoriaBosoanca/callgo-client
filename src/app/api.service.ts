@@ -45,7 +45,7 @@ export class ApiService {
 	private config = {iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun2.1.google.com:19302'] }]}
 
 	// callbacks that other classes can define using their context, but apiService calls them
-	public initMemberDisplay = (newMember: Member) => {
+	public initReceivingTracks(newMember: Member) {
 		newMember.conn!.ontrack = (event) => {
 			newMember.stream.addTrack(event.track)
 			// const videoElement: HTMLVideoElement = document.createElement('video')
@@ -61,8 +61,8 @@ export class ApiService {
 		}
 	}
 	
-	public localMediaStream: MediaStream| undefined = undefined
-	public initMemberCamera = (newMember: Member) => {
+	public localMediaStream: MediaStream | undefined = undefined
+	public initSendingTracks(newMember: Member) {
 		if(newMember.conn && this.localMediaStream) {
 			for(let track of this.localMediaStream.getTracks()) {
 				newMember.conn.addTrack(track, this.localMediaStream)
@@ -82,106 +82,101 @@ export class ApiService {
 		this.webSocket.onmessage = async (message: MessageEvent) => {
 			const data = JSON.parse(message.data)
 			
-			// when being asigned an ID
-			if(data.type == "assignID") {
-				sessionStorage.setItem("myID", data.memberID)
-				this.stableMembers.push({
-					"name": data.memberName,
-					"memberID": data.memberID,
-					"conn": null,
-					"stream": new MediaStream()
-				})
-			} 
+			switch(data.type) {
 
-			// when being notified about who is already in the meeting (aka when you join)
-			if(data.type == "exist") {
-				this.stableMembers.push({
-					"name": data.memberName,
-					"memberID": data.memberID,
-					"conn": null,
-					"stream": new MediaStream()
-				})
-			}
+				case 'assignID':
+					sessionStorage.setItem("myID", data.memberID)
+					this.stableMembers.push({
+						"name": data.memberName,
+						"memberID": data.memberID,
+						"conn": null,
+						"stream": new MediaStream()
+					})
+					break
 
-			// when being notified about a new joining member (aka when others join)
-			if(data.type == "join") {
-				// webRTC
-				const peerConnection = new RTCPeerConnection(this.config)
-				const dataChannel = peerConnection.createDataChannel("chat");
-				// send ICE
-				peerConnection.onicecandidate = ({candidate}) => {
-					if(candidate) {
-						console.log(candidate)
-					} else {
-						console.log(candidate)
-					}
-				}
-				// send SDP
-				try {
-					await peerConnection.setLocalDescription(await peerConnection.createOffer())
-					this.sendSDP(peerConnection.localDescription!, data.memberID, sessionStorage.getItem("myID")!)
-				} catch(error) {
-					console.log(error)
-				}
+				case 'exist':
+					this.stableMembers.push({
+						"name": data.memberName,
+						"memberID": data.memberID,
+						"conn": null,
+						"stream": new MediaStream()
+					})
+					break
 
-				this.stableMembers.push({
-					"name": data.memberName,
-					"memberID": data.memberID,
-					"conn": peerConnection,
-					"stream": new MediaStream()
-				})
-			}
-
-			// on member disconnect notification
-			if(data.type == "leave") {
-				this.stableMembers = this.stableMembers.filter(member => member.memberID != data.memberID)
-			}
-
-			// on received SDP
-			if(data.sdp) {
-				if(data.sdp.type == "offer") {
+				case 'join':
+					// webRTC
 					const peerConnection = new RTCPeerConnection(this.config)
+					peerConnection.createDataChannel('chat')
 					try {
-						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
-						findWithSameID!.conn = peerConnection
 						// send ICE
-						findWithSameID!.conn!.onicecandidate = ({candidate}) => {
-							if(candidate) {
+						peerConnection.onicecandidate = ({candidate}) => {
+							if(candidate && candidate.candidate) {
 								console.log(candidate)
-							} else {
-								console.log(candidate)
+								this.sendICE(candidate!, data.memberID, sessionStorage.getItem("myID")!)
 							}
 						}
-						await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp))
-						await peerConnection.setLocalDescription(await peerConnection.createAnswer())
-						this.sendSDP(peerConnection.localDescription!, data.from, sessionStorage.getItem("myID")!)
-
-						this.initMemberDisplay(findWithSameID!)
-						this.initMemberCamera(findWithSameID!)
+						// send SDP
+						await peerConnection.setLocalDescription(await peerConnection.createOffer())
+						this.sendSDP(peerConnection.localDescription!, data.memberID, sessionStorage.getItem("myID")!)
 					} catch(error) {
 						console.log(error)
 					}
-				}
-	
-				if(data.sdp.type == "answer") {
-					try {
-						const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
-						// send ICE
-						findWithSameID!.conn!.onicecandidate = ({candidate}) => {
-							if(candidate) {
-								console.log(candidate)
-							} else {
-								console.log(candidate)
-							}
-						}
-						await findWithSameID!.conn!.setRemoteDescription(new RTCSessionDescription(data.sdp))
+		
+					this.stableMembers.push({
+						"name": data.memberName,
+						"memberID": data.memberID,
+						"conn": peerConnection,
+						"stream": new MediaStream()
+					})
+					break
+				
+				case 'leave':
+					this.stableMembers = this.stableMembers.filter(member => member.memberID != data.memberID)
+					break
 
-						this.initMemberDisplay(findWithSameID!)
-						this.initMemberCamera(findWithSameID!)
-					} catch(error) {
-						console.log(error)
+				case 'sdp':
+					if(data.sdp.type == 'offer') {
+						const peerConnection = new RTCPeerConnection(this.config)
+						try {
+							// ICE
+							peerConnection.onicecandidate = ({candidate}) => {
+								if(candidate && candidate.candidate) {
+									console.log(candidate)
+									this.sendICE(candidate, data.memberID, sessionStorage.getItem("myID")!)
+								}
+							}
+							// SDP
+							const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
+							findWithSameID!.conn = peerConnection
+							await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp))
+							await peerConnection.setLocalDescription(await peerConnection.createAnswer())
+							this.sendSDP(peerConnection.localDescription!, data.from, sessionStorage.getItem("myID")!)
+		
+							this.initReceivingTracks(findWithSameID!)
+							this.initSendingTracks(findWithSameID!)
+						} catch(error) {
+							console.log(error)
+						}
 					}
-				}
+
+					if(data.sdp.type == 'answer') {
+						try {
+							const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
+							await findWithSameID!.conn!.setRemoteDescription(new RTCSessionDescription(data.sdp))
+		
+							this.initReceivingTracks(findWithSameID!)
+							this.initSendingTracks(findWithSameID!)
+						} catch(error) {
+							console.log(error)
+						}
+					}
+					break
+				
+				case 'ice':
+					const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
+					// console.log(data)
+					findWithSameID!.conn!.addIceCandidate(new RTCIceCandidate(data.ice))
+					break
 			}
 		}
 	
@@ -206,9 +201,19 @@ export class ApiService {
 
 	sendSDP(sdp: RTCSessionDescriptionInit, to: string, from: string) {
 		this.webSocket.send(JSON.stringify({
+			"type": "sdp",
 			"to": to,
 			"from": from,
 			"sdp": sdp
+		}))
+	}
+
+	sendICE(ice: RTCIceCandidate, to: string, from: string) {
+		this.webSocket.send(JSON.stringify({
+			"type": "ice",
+			"to": to,
+			"from": from,
+			"ice": ice
 		}))
 	}
 }
