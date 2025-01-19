@@ -16,13 +16,14 @@ export class DisplayComponent implements OnInit {
 	videoBox!: ElementRef<HTMLVideoElement>
 
 	ngOnInit(): void {
-		const timer = setInterval(() => {
+		setInterval(() => {
 			for(let member of this.apiService.stableMembers) {
 				if(member.conn) {
-					member.conn!.oniceconnectionstatechange = () => {
-						console.log(member.conn!.iceConnectionState)
+					member.conn.oniceconnectionstatechange = () => {
+						console.log(member.memberID, member.conn!.iceConnectionState)
 					}
-					member.conn!.ontrack = (event) => {
+					member.conn.ontrack = (event) => {
+						console.log("YES")
 						this.videoBox.nativeElement.replaceChildren()
 						const video = document.createElement('video')
 						video.srcObject = event.streams[0]

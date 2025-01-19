@@ -49,7 +49,7 @@ export class ApiService {
 
 		this.webSocket = new WebSocket(`${this.webSocketUrl}?sessionID=${sessionID}&displayName=${displayName}`)
 	
-		this.webSocket.onopen = (event: Event) => {
+		this.webSocket.onopen = (event) => {
 			console.log('WebSocket connection established')
 		}
 	
@@ -80,6 +80,7 @@ export class ApiService {
 				case 'join':
 					// webRTC
 					const peerConnection = new RTCPeerConnection(this.config)
+					peerConnection.addTransceiver('video', {direction: 'sendrecv'})
 					peerConnection.createDataChannel('chat')
 					try {
 						// send ICE
@@ -110,6 +111,7 @@ export class ApiService {
 				case 'sdp':
 					if(data.sdp.type == 'offer') {
 						const peerConnection = new RTCPeerConnection(this.config)
+						peerConnection.addTransceiver('video', {direction: 'sendrecv'})
 						try {
 							// ICE
 							peerConnection.onicecandidate = ({candidate}) => {

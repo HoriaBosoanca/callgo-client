@@ -57,10 +57,13 @@ export class CameraComponent implements OnInit {
 	async turnOnCamera() {
 		this.camIsOn = true;
 		
-		this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+		this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
 		for(let member of this.apiService.stableMembers) {
-			for(let track of this.localStream.getTracks()) {
-				member.conn?.addTrack(track, this.localStream)
+			if(member.conn) {
+				for(let track of this.localStream.getTracks()) {
+					member.conn.addTrack(track, this.localStream)
+					console.log(sessionStorage.getItem('myID'), "sent a track to", member.memberID)
+				}
 			}
 		} 
 		this.videoElement.play()
