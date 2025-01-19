@@ -44,32 +44,6 @@ export class ApiService {
 	// stun server
 	private config = {iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun2.1.google.com:19302'] }]}
 
-	// callbacks that other classes can define using their context, but apiService calls them
-	public initReceivingTracks(newMember: Member) {
-		newMember.conn!.ontrack = (event) => {
-			newMember.stream.addTrack(event.track)
-			// const videoElement: HTMLVideoElement = document.createElement('video')
-			// videoElement.srcObject = mediaStream
-			// this.videos.push(videoElement)
-
-			// const pElement: HTMLParagraphElement = document.createElement('p')
-			// pElement.innerHTML = member.name
-			// this.names.push(pElement) 
-			
-			// this.videoBox.nativeElement.appendChild(videoElement)
-			// videoElement.play()
-		}
-	}
-	
-	public localMediaStream: MediaStream | undefined = undefined
-	public initSendingTracks(newMember: Member) {
-		if(newMember.conn && this.localMediaStream) {
-			for(let track of this.localMediaStream.getTracks()) {
-				newMember.conn.addTrack(track, this.localMediaStream)
-			}
-		}
-	}
-
 	async connect(sessionID: string, displayName: string) {
 		console.log(sessionID)
 
@@ -111,8 +85,7 @@ export class ApiService {
 						// send ICE
 						peerConnection.onicecandidate = ({candidate}) => {
 							if(candidate && candidate.candidate) {
-								console.log(candidate)
-								this.sendICE(candidate!, data.memberID, sessionStorage.getItem("myID")!)
+								this.sendICE(candidate, data.memberID, sessionStorage.getItem("myID")!)
 							}
 						}
 						// send SDP
@@ -141,7 +114,6 @@ export class ApiService {
 							// ICE
 							peerConnection.onicecandidate = ({candidate}) => {
 								if(candidate && candidate.candidate) {
-									console.log(candidate)
 									this.sendICE(candidate, data.memberID, sessionStorage.getItem("myID")!)
 								}
 							}
@@ -151,9 +123,6 @@ export class ApiService {
 							await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp))
 							await peerConnection.setLocalDescription(await peerConnection.createAnswer())
 							this.sendSDP(peerConnection.localDescription!, data.from, sessionStorage.getItem("myID")!)
-		
-							this.initReceivingTracks(findWithSameID!)
-							this.initSendingTracks(findWithSameID!)
 						} catch(error) {
 							console.log(error)
 						}
@@ -163,9 +132,6 @@ export class ApiService {
 						try {
 							const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
 							await findWithSameID!.conn!.setRemoteDescription(new RTCSessionDescription(data.sdp))
-		
-							this.initReceivingTracks(findWithSameID!)
-							this.initSendingTracks(findWithSameID!)
 						} catch(error) {
 							console.log(error)
 						}
@@ -174,7 +140,6 @@ export class ApiService {
 				
 				case 'ice':
 					const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
-					// console.log(data)
 					findWithSameID!.conn!.addIceCandidate(new RTCIceCandidate(data.ice))
 					break
 			}
