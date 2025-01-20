@@ -8,6 +8,7 @@ interface Member {
 	name: string
 	conn: RTCPeerConnection | null
 	stream: MediaStream
+	chan: RTCDataChannel | null
 }
 
 @Injectable({
@@ -16,6 +17,10 @@ providedIn: 'root'
 export class ApiService {
 
 	constructor(private http: HttpClient, private router: Router) { }
+
+	async askForStream() {
+		this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+	}
 
 	// members data
 	public stableMembers: Member[] = []
@@ -44,6 +49,9 @@ export class ApiService {
 	// stun server
 	private config = {iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun2.1.google.com:19302'] }]}
 
+	// local stream
+	localStream: MediaStream = new MediaStream() 
+	
 	async connect(sessionID: string, displayName: string) {
 		console.log(sessionID)
 
@@ -64,7 +72,8 @@ export class ApiService {
 						"name": data.memberName,
 						"memberID": data.memberID,
 						"conn": null,
-						"stream": new MediaStream()
+						"stream": new MediaStream(),
+						"chan": null
 					})
 					break
 
@@ -73,15 +82,27 @@ export class ApiService {
 						"name": data.memberName,
 						"memberID": data.memberID,
 						"conn": null,
-						"stream": new MediaStream()
+						"stream": new MediaStream(),
+						"chan": null
 					})
 					break
 
 				case 'join':
 					// webRTC
 					const peerConnection = new RTCPeerConnection(this.config)
-					peerConnection.addTransceiver('video', {direction: 'sendrecv'})
-					peerConnection.createDataChannel('chat')
+					let stream = new MediaStream()
+					// ontrack
+					peerConnection.ontrack = (event) => {
+						try {
+							stream = event.streams[0]
+						} catch(error) {
+							console.log(error)
+						}
+					}
+					// send tracks
+					for(let track of this.localStream.getTracks()) {
+						peerConnection.addTrack(track, this.localStream)
+					}
 					try {
 						// send ICE
 						peerConnection.onicecandidate = ({candidate}) => {
@@ -90,7 +111,8 @@ export class ApiService {
 							}
 						}
 						// send SDP
-						await peerConnection.setLocalDescription(await peerConnection.createOffer())
+						const offer = await peerConnection.createOffer()
+						await peerConnection.setLocalDescription(offer)
 						this.sendSDP(peerConnection.localDescription!, data.memberID, sessionStorage.getItem("myID")!)
 					} catch(error) {
 						console.log(error)
@@ -100,7 +122,8 @@ export class ApiService {
 						"name": data.memberName,
 						"memberID": data.memberID,
 						"conn": peerConnection,
-						"stream": new MediaStream()
+						"stream": stream,
+						"chan": null
 					})
 					break
 				
@@ -111,7 +134,11 @@ export class ApiService {
 				case 'sdp':
 					if(data.sdp.type == 'offer') {
 						const peerConnection = new RTCPeerConnection(this.config)
-						peerConnection.addTransceiver('video', {direction: 'sendrecv'})
+						let stream = new MediaStream()
+						// ontrack
+						peerConnection.ontrack = (event) => {
+							stream = event.streams[0]
+						}
 						try {
 							// ICE
 							peerConnection.onicecandidate = ({candidate}) => {
@@ -122,8 +149,10 @@ export class ApiService {
 							// SDP
 							const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
 							findWithSameID!.conn = peerConnection
+							findWithSameID!.stream = stream
 							await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp))
-							await peerConnection.setLocalDescription(await peerConnection.createAnswer())
+							const answer = await peerConnection.createAnswer()
+							await peerConnection.setLocalDescription(answer)
 							this.sendSDP(peerConnection.localDescription!, data.from, sessionStorage.getItem("myID")!)
 						} catch(error) {
 							console.log(error)

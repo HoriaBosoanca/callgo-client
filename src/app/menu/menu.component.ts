@@ -13,7 +13,9 @@ import { Router } from '@angular/router';
 export class MenuComponent implements OnInit {
 	constructor(private router: Router, private apiService: ApiService) {}
 	
-	ngOnInit(): void {}
+	async ngOnInit(): Promise<void> {
+		await this.apiService.askForStream();
+	}
 	
 	// input
 	displayNameCreate: string = ""

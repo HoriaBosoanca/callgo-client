@@ -15,24 +15,35 @@ export class DisplayComponent implements OnInit {
 	@ViewChild('videoBox')
 	videoBox!: ElementRef<HTMLVideoElement>
 
+	amountOfMembers: number = 0
+
 	ngOnInit(): void {
 		setInterval(() => {
+			if(this.amountOfMembers != this.apiService.stableMembers.length) {
+				this.resetVideos()
+			}
+
+			this.amountOfMembers = this.apiService.stableMembers.length
+
 			for(let member of this.apiService.stableMembers) {
 				if(member.conn) {
-					member.conn.oniceconnectionstatechange = () => {
+					member.conn.onconnectionstatechange = () => {
 						console.log(member.memberID, member.conn!.iceConnectionState)
-					}
-					member.conn.ontrack = (event) => {
-						console.log("YES")
-						this.videoBox.nativeElement.replaceChildren()
-						const video = document.createElement('video')
-						video.srcObject = event.streams[0]
-						video.muted = true
-						video.play()
-						this.videoBox.nativeElement.appendChild(video)
 					}
 				}
 			}
 		}, 200) 
+	}
+
+	resetVideos() {
+		for(let member of this.apiService.stableMembers) {
+			this.videoBox.nativeElement.replaceChildren()
+			const video = document.createElement('video')
+			console.log(member.stream)
+			video.srcObject = member.stream
+			video.muted = true
+			video.play()
+			this.videoBox.nativeElement.appendChild(video)
+		}
 	}
 }
