@@ -6,6 +6,7 @@ The repo for the server is [here](https://github.com/HoriaBosoanca/callgo-server
 The live app is [here](callgo.horia.live).
 
 ## Todo
+Re-implement refreshing (getUserMedia mutiple times) \
 Microphone support \
 Share screen support
 

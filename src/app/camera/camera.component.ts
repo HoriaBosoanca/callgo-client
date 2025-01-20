@@ -21,6 +21,8 @@ export class CameraComponent implements OnInit {
 		
 		await this.apiService.connect(sessionStorage.getItem("sessionID")!, sessionStorage.getItem("myName")!)
 		this.videoElement.srcObject = this.apiService.localStream
+		this.videoElement.muted = true
+		this.videoElement.classList.add('video')
 		await this.videoElement.play()
 		this.videoBox.nativeElement.appendChild(this.videoElement)
 

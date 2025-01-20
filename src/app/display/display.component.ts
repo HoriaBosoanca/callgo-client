@@ -40,6 +40,7 @@ export class DisplayComponent implements OnInit {
 		for(let member of this.apiService.stableMembers) {
 			if(member.conn) {
 				member.video.muted = true
+				member.video.classList.add('video')
 				this.videoBox.nativeElement.appendChild(member.video)
 			}
 		}
