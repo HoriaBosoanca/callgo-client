@@ -7,8 +7,7 @@ interface Member {
 	memberID: string
 	name: string
 	conn: RTCPeerConnection | null
-	stream: MediaStream
-	chan: RTCDataChannel | null
+	video: HTMLVideoElement
 }
 
 @Injectable({
@@ -72,8 +71,7 @@ export class ApiService {
 						"name": data.memberName,
 						"memberID": data.memberID,
 						"conn": null,
-						"stream": new MediaStream(),
-						"chan": null
+						"video": document.createElement('video')
 					})
 					break
 
@@ -82,19 +80,23 @@ export class ApiService {
 						"name": data.memberName,
 						"memberID": data.memberID,
 						"conn": null,
-						"stream": new MediaStream(),
-						"chan": null
+						"video": document.createElement('video')
 					})
 					break
 
 				case 'join':
 					// webRTC
 					const peerConnection = new RTCPeerConnection(this.config)
-					let stream = new MediaStream()
+					const video = document.createElement('video')
+					// logging
+					peerConnection.onconnectionstatechange = () => {
+						console.log(data.memberID, peerConnection.iceConnectionState)
+					}
 					// ontrack
-					peerConnection.ontrack = (event) => {
+					peerConnection.ontrack = async (event) => {
 						try {
-							stream = event.streams[0]
+							video.srcObject = event.streams[0]
+							await video.play()
 						} catch(error) {
 							console.log(error)
 						}
@@ -122,8 +124,7 @@ export class ApiService {
 						"name": data.memberName,
 						"memberID": data.memberID,
 						"conn": peerConnection,
-						"stream": stream,
-						"chan": null
+						"video": video
 					})
 					break
 				
@@ -134,10 +135,23 @@ export class ApiService {
 				case 'sdp':
 					if(data.sdp.type == 'offer') {
 						const peerConnection = new RTCPeerConnection(this.config)
-						let stream = new MediaStream()
+						const video = document.createElement('video')
+						// logging
+						peerConnection.onconnectionstatechange = () => {
+							console.log(data.from, peerConnection.iceConnectionState)
+						}
 						// ontrack
-						peerConnection.ontrack = (event) => {
-							stream = event.streams[0]
+						peerConnection.ontrack = async (event) => {
+							try {
+								video.srcObject = event.streams[0]
+								await video.play()
+							} catch(error) {
+								console.log(error)
+							}
+						}
+						// send tracks
+						for(let track of this.localStream.getTracks()) {
+							peerConnection.addTrack(track, this.localStream)
 						}
 						try {
 							// ICE
@@ -149,7 +163,7 @@ export class ApiService {
 							// SDP
 							const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
 							findWithSameID!.conn = peerConnection
-							findWithSameID!.stream = stream
+							findWithSameID!.video = video
 							await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp))
 							const answer = await peerConnection.createAnswer()
 							await peerConnection.setLocalDescription(answer)

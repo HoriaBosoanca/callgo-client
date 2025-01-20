@@ -6,13 +6,8 @@ The repo for the server is [here](https://github.com/HoriaBosoanca/callgo-server
 The live app is [here](callgo.horia.live).
 
 ## Todo
-Use WebRTC \
 Microphone support \
-If sent video data is still too slow, learn how to use web workers \
-Use more goroutines on the server \
-Make a session cleanup system on the server (session timeouts) \
-Share screen support \
-Implement join request feature
+Share screen support
 
 ## Done
 Send and receive video data via http \
@@ -31,4 +26,5 @@ Implement redirect to menu when the websocket closes \
 Reimplement list component and kicking \
 Learn about sync.mutex and use it on the server (to safely write to ws connections and maps) \
 Live member join and disconnect ws notifications \
-Link client to domain (callgo.horia.live)
+Link client to domain (callgo.horia.live) \
+Use WebRTC

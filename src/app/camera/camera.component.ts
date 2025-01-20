@@ -57,7 +57,7 @@ export class CameraComponent implements OnInit {
 	async turnOnCamera() {
 		this.camIsOn = true;
 		this.videoElement.srcObject = this.apiService.localStream
-		this.videoElement.play()
+		await this.videoElement.play()
 	}
 
 	listIsDisplayed = false

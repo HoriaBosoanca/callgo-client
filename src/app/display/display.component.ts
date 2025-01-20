@@ -32,18 +32,16 @@ export class DisplayComponent implements OnInit {
 					}
 				}
 			}
-		}, 200) 
+		}, 200)
 	}
 
 	resetVideos() {
+		this.videoBox.nativeElement.replaceChildren()
 		for(let member of this.apiService.stableMembers) {
-			this.videoBox.nativeElement.replaceChildren()
-			const video = document.createElement('video')
-			console.log(member.stream)
-			video.srcObject = member.stream
-			video.muted = true
-			video.play()
-			this.videoBox.nativeElement.appendChild(video)
+			if(member.conn) {
+				member.video.muted = true
+				this.videoBox.nativeElement.appendChild(member.video)
+			}
 		}
 	}
 }
