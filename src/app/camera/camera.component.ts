@@ -20,6 +20,8 @@ export class CameraComponent implements OnInit {
 	async ngOnInit() {
 		
 		await this.apiService.connect(sessionStorage.getItem("sessionID")!, sessionStorage.getItem("myName")!)
+		this.videoElement.srcObject = this.apiService.localStream
+		await this.videoElement.play()
 		this.videoBox.nativeElement.appendChild(this.videoElement)
 
 		this.router.events
@@ -37,7 +39,7 @@ export class CameraComponent implements OnInit {
 	videoElement: HTMLVideoElement = document.createElement('video')
 	
 	// Toggle camera on/off
-	camIsOn = false;
+	camIsOn = true
 	async camera(): Promise<void> {
 		// toggle
 		if (this.camIsOn) {
@@ -46,17 +48,19 @@ export class CameraComponent implements OnInit {
 			await this.turnOnCamera()
 		}
 	}
-
-	localStream: MediaStream = new MediaStream()
 	
 	turnOffCamera() {
-		this.camIsOn = false;
-		this.videoElement.srcObject = null;
+		this.camIsOn = false
+		this.apiService.localStream.getTracks().forEach((track) => {
+			track.enabled = false
+		})
 	}
 	
 	async turnOnCamera() {
-		this.camIsOn = true;
-		this.videoElement.srcObject = this.apiService.localStream
+		this.camIsOn = true
+		this.apiService.localStream.getTracks().forEach((track) => {
+			track.enabled = true
+		})
 		await this.videoElement.play()
 	}
 
