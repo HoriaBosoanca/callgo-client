@@ -26,14 +26,29 @@
 
     border-width: 0vh;
     border-radius: 1vh;
+
     background-color: rgb(85, 156, 38);
 
-    transition: 0.3s;
+    /* transition: 0.3s; */
 }
 
-.iobutton:hover{
-    background-color: rgb(60, 255, 0);
+.iobuttonred {
+    margin: auto;
+    height: 12vh;
+    width: 12vh;
+    margin-bottom: 1.5vh;
+    
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
+
+    border-width: 0vh;
+    border-radius: 1vh;
+
+    background-color: rgb(156, 38, 38);
 }
+
+/* .iobutton:hover{
+    background-color: rgb(60, 255, 0);
+} */
 
 .dropdown{
     position: fixed;
@@ -53,7 +68,6 @@
 }
 
 .video{
-    height: 40vh;
     height: auto;
 }
 

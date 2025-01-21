@@ -49,7 +49,7 @@ export class ApiService {
 	private config = {iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun2.1.google.com:19302'] }]}
 
 	// local stream
-	localStream: MediaStream = new MediaStream() 
+	localStream: MediaStream | null = null 
 	
 	async connect(sessionID: string, displayName: string) {
 		console.log(sessionID)
@@ -102,8 +102,8 @@ export class ApiService {
 						}
 					}
 					// send tracks
-					for(let track of this.localStream.getTracks()) {
-						peerConnection.addTrack(track, this.localStream)
+					for(let track of this.localStream!.getTracks()) {
+						peerConnection.addTrack(track, this.localStream!)
 					}
 					try {
 						// send ICE
@@ -150,8 +150,8 @@ export class ApiService {
 							}
 						}
 						// send tracks
-						for(let track of this.localStream.getTracks()) {
-							peerConnection.addTrack(track, this.localStream)
+						for(let track of this.localStream!.getTracks()) {
+							peerConnection.addTrack(track, this.localStream!)
 						}
 						try {
 							// ICE

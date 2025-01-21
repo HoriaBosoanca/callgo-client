@@ -1,11 +1,10 @@
+.video{
+    height: auto;
+}
+
 .videoBox{
     justify-content: center;
     display: flex;
     gap: 1%;
     height: 40vh;
-}
-
-.video{
-    height: 40vh;
-    height: auto;
 }

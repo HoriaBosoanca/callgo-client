@@ -7,13 +7,16 @@
 <div #videoBox class="videoBox"></div>
 
 <div id="controls">
-    <button class="iobutton" (click)="camera()">
+    <button class="iobutton" (click)="toggleCamera()" #cameraButton>
         <img style="width: 100%; margin-left: 3%;" src="assets/images/camera-icon.png">
     </button>
 
-    <!-- TODO: mic -->
-    <button class="iobutton">
+    <button class="iobutton" (click)="toggleMicrophone()" #microphoneButton>
         <img style="width: 50%;" src="assets/images/microphone-icon.png">
+    </button>
+
+    <button class="iobuttonred" (click)="toggleAudio()" #audioButton>
+        <img style="width: 50%;" src="assets/images/headphones-icon.png">
     </button>
 
     <button class="iobutton" (click)="toggleList()">

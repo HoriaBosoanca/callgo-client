@@ -41,7 +41,23 @@ export class DisplayComponent implements OnInit {
 			if(member.conn) {
 				member.video.muted = true
 				member.video.classList.add('video')
-				this.videoBox.nativeElement.appendChild(member.video)
+
+				const p = document.createElement('p')
+				p.innerHTML = member.name
+				p.style.color = 'white'
+				p.style.fontSize = '3vh'
+				p.style.position = 'absolute'
+				p.style.top = '45%'
+				p.style.left = '50%'
+
+				const div = document.createElement('div')
+				div.style.height = '40vh'
+				div.style.display = 'flex'
+				div.style.position = 'relative'
+				div.appendChild(member.video)
+				div.appendChild(p)
+
+				this.videoBox.nativeElement.appendChild(div)
 			}
 		}
 	}

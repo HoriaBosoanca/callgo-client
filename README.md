@@ -6,7 +6,6 @@ The repo for the server is [here](https://github.com/HoriaBosoanca/callgo-server
 The live app is [here](callgo.horia.live).
 
 ## Todo
-Re-implement refreshing (getUserMedia mutiple times) \
 Microphone support \
 Share screen support
 
@@ -28,4 +27,6 @@ Reimplement list component and kicking \
 Learn about sync.mutex and use it on the server (to safely write to ws connections and maps) \
 Live member join and disconnect ws notifications \
 Link client to domain (callgo.horia.live) \
-Use WebRTC
+Use WebRTC \
+Re-implement refreshing (getUserMedia mutiple times) \
+Re-implement display names
