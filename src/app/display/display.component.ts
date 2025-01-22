@@ -15,15 +15,21 @@ export class DisplayComponent implements OnInit {
 	@ViewChild('videoBox')
 	videoBox!: ElementRef<HTMLVideoElement>
 
-	amountOfMembers: number = 0
+	amountOfVideos: number = 0
 
 	ngOnInit(): void {
 		setInterval(() => {
-			if(this.amountOfMembers != this.apiService.stableMembers.length) {
-				this.resetVideos()
+			let videoCount = 0
+			for(let member of this.apiService.stableMembers) {
+				if(member.video) {
+					videoCount++;
+				}
 			}
 
-			this.amountOfMembers = this.apiService.stableMembers.length
+			if(videoCount != this.amountOfVideos) {
+				this.amountOfVideos = videoCount
+				this.resetVideos()
+			}
 
 			for(let member of this.apiService.stableMembers) {
 				if(member.conn) {
