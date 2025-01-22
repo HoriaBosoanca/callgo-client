@@ -118,11 +118,11 @@ export class ApiService {
 					}
 					try {
 						// send ICE
-						peerConnection.onicecandidate = ({candidate}) => {
-							if(candidate && candidate.candidate) {
-								this.sendICE(candidate, data.memberID, sessionStorage.getItem("myID")!)
-							}
-						}
+						// peerConnection.onicecandidate = ({candidate}) => {
+						// 	if(candidate && candidate.candidate) {
+						// 		this.sendICE(candidate, data.memberID, sessionStorage.getItem("myID")!)
+						// 	}
+						// }
 						// send SDP
 						const offer = await peerConnection.createOffer()
 						await peerConnection.setLocalDescription(offer)
@@ -166,11 +166,11 @@ export class ApiService {
 						}
 						try {
 							// ICE
-							peerConnection.onicecandidate = ({candidate}) => {
-								if(candidate && candidate.candidate) {
-									this.sendICE(candidate, data.memberID, sessionStorage.getItem("myID")!)
-								}
-							}
+							// peerConnection.onicecandidate = ({candidate}) => {
+							// 	if(candidate && candidate.candidate) {
+							// 		this.sendICE(candidate, data.memberID, sessionStorage.getItem("myID")!)
+							// 	}
+							// }
 							// SDP
 							const findWithSameID = this.stableMembers.find(member => member?.memberID == data?.from)
 							findWithSameID!.conn = peerConnection
