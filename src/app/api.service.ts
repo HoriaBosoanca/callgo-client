@@ -46,7 +46,18 @@ export class ApiService {
 	private webSocket!: WebSocket
 
 	// stun server
-	private config = {iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun2.1.google.com:19302'] }]}
+	private config = {
+		iceServers: [
+			{
+				urls: 'stun:openrelay.metered.ca:80'
+			},
+			{
+				urls: 'turn:openrelay.metered.ca:80',
+				username: 'openrelayproject',
+				credential: "openrelayproject"
+			}
+		]
+	}
 
 	// local stream
 	localStream: MediaStream | null = null 
