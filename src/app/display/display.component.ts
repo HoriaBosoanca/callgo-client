@@ -30,6 +30,7 @@ export class DisplayComponent implements OnInit {
 					member.conn.onconnectionstatechange = () => {
 						console.log(member.memberID, member.conn!.iceConnectionState)
 					}
+					console.log(member.video.srcObject)
 				}
 			}
 		}, 200)
